@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "client": "ron",
+  "project": "copilot",
+  "platform": "python",
+  "target": "local",
+  "status": "start",
+  "tasks": [
+    {
+      "id": "rcp-001",
+      "title": "Resolve environment/toolchain decision (Python vs Node vs edge runtime)",
+      "state": "done",
+      "priority": "high"
+    },
+    {
+      "id": "rcp-002",
+      "title": "Derive meta philosophy, metaskill, metaframework, and meta scaffold",
+      "state": "done",
+      "priority": "high"
+    },
+    {
+      "id": "rcp-003",
+      "title": "Define AI command protocol grammar and legal fields",
+      "state": "done",
+      "priority": "high"
+    },
+    {
+      "id": "rcp-004",
+      "title": "Implement strict protocol block validator and translator",
+      "state": "done",
+      "priority": "high"
+    },
+    {
+      "id": "rcp-005",
+      "title": "Add examples for converting natural language into protocol blocks",
+      "state": "done",
+      "priority": "medium"
+    }
+  ]
+}

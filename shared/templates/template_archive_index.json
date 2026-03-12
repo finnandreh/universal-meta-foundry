@@ -18,6 +18,16 @@
   ],
   "project_template_usage": [
     {
+      "project_path": "clients/ron/systems/copilot",
+      "templates": [
+        {
+          "template_id": "soul.identity.template",
+          "version": "1.0.0",
+          "role": "governance_reference"
+        }
+      ]
+    },
+    {
       "project_path": "clients/finn/systems/esp32metstest",
       "templates": [
         {

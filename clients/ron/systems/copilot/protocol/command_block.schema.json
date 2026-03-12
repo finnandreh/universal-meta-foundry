@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "acp-command-block.schema.json",
+  "title": "ACP Command Block",
+  "type": "object",
+  "required": [
+    "protocol",
+    "command_type",
+    "target_type",
+    "execution_mode",
+    "request_id",
+    "summary",
+    "payload_json",
+    "guards_json"
+  ],
+  "properties": {
+    "protocol": {
+      "const": "ACP/1.0"
+    },
+    "command_type": {
+      "enum": ["create", "update", "delete", "state", "specify", "intake", "validate"]
+    },
+    "target_type": {
+      "enum": ["project", "system", "file", "folder", "task", "docs", "runtime"]
+    },
+    "execution_mode": {
+      "enum": ["dry_run", "plan_only", "apply"]
+    },
+    "request_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "summary": {
+      "type": "string",
+      "minLength": 1
+    },
+    "payload_json": {
+      "type": "object"
+    },
+    "guards_json": {
+      "type": "object"
+    },
+    "context_json": {
+      "type": "object"
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "additionalProperties": false
+}
