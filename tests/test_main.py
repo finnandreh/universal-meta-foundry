@@ -38,6 +38,9 @@ def test_root_serves_frontend_prototype() -> None:
     assert "Export Project Bundle" in response.text
     assert "Import Project Bundle" in response.text
     assert "Prompt Structure Preview" in response.text
+    assert "Delivery Type" in response.text
+    assert "Ready System" in response.text
+    assert "Meta System Builder" in response.text
     assert "Project Name" in response.text
     assert "Sub-Part Name" in response.text
     assert "Add Task" in response.text

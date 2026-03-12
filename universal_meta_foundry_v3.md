@@ -2937,3 +2937,32 @@ Roadmap operating rule:
 * prioritize Phase 1 items first unless a critical enterprise need requires Phase 2 acceleration
 * keep the master system lightweight while adding governance depth incrementally
 * every approved roadmap item must update this master document and relevant Soul identity metadata
+
+### 26.41 Dual Delivery Type Selection (Implemented)
+
+Date: 2026-03-12
+
+Added explicit delivery selection so a client can choose between:
+
+* `ready_system` (deliver a concrete ready-to-run system)
+* `meta_system_builder` (deliver a system that creates systems)
+
+GUI update:
+
+* new `Delivery Type` selector in Domain Draft with both options
+
+JSON and packet update:
+
+* domain model now carries `domain.delivery_type`
+* draft export/import preserves `delivery_type`
+* project bundle export includes `delivery_type`
+* prompt packet includes `domain.delivery_type`
+
+Handoff governance update:
+
+* Copilot handoff readiness now checks that delivery type is explicitly selected
+
+Outcome:
+
+* Foundry can represent both delivery classes in a governed way
+* prompt and execution intent are clearer for both client-facing systems and meta-system builder projects

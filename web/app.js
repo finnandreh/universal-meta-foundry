@@ -66,6 +66,7 @@ const copilotReadiness = document.getElementById("copilotReadiness");
 const domainName = document.getElementById("domainName");
 const clientName = document.getElementById("clientName");
 const prototypeGoal = document.getElementById("prototypeGoal");
+const deliveryType = document.getElementById("deliveryType");
 const domainNotes = document.getElementById("domainNotes");
 const projectName = document.getElementById("projectName");
 const systemName = document.getElementById("systemName");
@@ -516,6 +517,7 @@ function setDefaultDomainFields() {
     "core-planner",
     "Capture internal reusable baseline"
   );
+  deliveryType.value = "ready_system";
   domainNotes.value = "Focus on minimal-first visual planning with explicit phase gates.";
   syncSoulInputsFromConfig();
 }
@@ -852,6 +854,12 @@ function sanitizeDraft(payload) {
         : domain && typeof domain.prototype_goal === "string"
           ? domain.prototype_goal
         : "Capture internal reusable baseline",
+    delivery_type:
+      domain &&
+      typeof domain.delivery_type === "string" &&
+      ["ready_system", "meta_system_builder"].includes(domain.delivery_type)
+        ? domain.delivery_type
+        : "ready_system",
     notes:
       domain && typeof domain.notes === "string"
         ? domain.notes
@@ -1083,6 +1091,7 @@ function buildDraftPayload() {
       name: domainName.value,
       client: clientName.value,
       goal: prototypeGoal.value,
+      delivery_type: deliveryType.value,
       notes: domainNotes.value,
       project: projectName.value,
       system: systemName.value
@@ -1130,6 +1139,7 @@ function applyDraftPayload(payload) {
     normalized.domain.goal
   );
   domainName.value = normalized.domain.name;
+  deliveryType.value = normalized.domain.delivery_type;
   domainNotes.value = normalized.domain.notes;
   taskModel = normalized.tasks;
 
@@ -1229,6 +1239,9 @@ function buildCopilotReadiness() {
   const projectReady = projectName.value.trim().length > 0;
   const systemReady = systemName.value.trim().length > 0;
   const goalReady = prototypeGoal.value.trim().length > 0;
+  const deliveryTypeReady = ["ready_system", "meta_system_builder"].includes(
+    deliveryType.value
+  );
   const taskStateReady = setupCatalog.task_states.length > 0;
   const taskTemplateReady = setupCatalog.task_templates.length > 0;
   const hasTodoTask = taskModel.some(
@@ -1251,6 +1264,11 @@ function buildCopilotReadiness() {
       id: "goal_present",
       label: "Prompt goal is defined",
       pass: goalReady
+    },
+    {
+      id: "delivery_type",
+      label: "Delivery type is selected (ready system or meta system builder)",
+      pass: deliveryTypeReady
     },
     {
       id: "todo_available",
@@ -1432,6 +1450,10 @@ function renderPromptPacketSummary(payload) {
       text: payload.domain.prototype_goal
     },
     {
+      title: "Delivery Type",
+      text: payload.domain.delivery_type
+    },
+    {
       title: "Selected Tasks",
       text: `${payload.selected_tasks.length} task(s) in state filter ${payload.selected_state}`
     },
@@ -1475,6 +1497,7 @@ function buildProjectBundle() {
       name: domainName.value,
       client,
       goal: prototypeGoal.value,
+      delivery_type: deliveryType.value,
       notes: domainNotes.value,
       project,
       system
@@ -1667,6 +1690,7 @@ function renderPacket(mode, data) {
         name: domainName.value.trim(),
         client: clientName.value.trim(),
         prototype_goal: prototypeGoal.value.trim(),
+        delivery_type: deliveryType.value,
         notes: domainNotes.value.trim(),
         project: projectName.value.trim(),
         system: systemName.value.trim()
@@ -2098,7 +2122,7 @@ for (const input of [
   });
 }
 
-for (const select of [prototypeGoal, systemName]) {
+for (const select of [prototypeGoal, deliveryType, systemName]) {
   select.addEventListener("change", () => {
     renderPromptStructurePreview();
     syncProjectSystemCatalogInputs();
