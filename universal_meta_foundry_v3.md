@@ -2877,3 +2877,63 @@ Outcome:
 
 * generated projects cannot be treated as identity-context-free at handoff time
 * identity scope requirements are checked in the same readiness gate used for prompt quality and task governance
+
+### 26.40 Soul Governance Roadmap (Planned, No Implementation Yet)
+
+Date: 2026-03-12
+
+This roadmap captures next-stage Soul and governance expansions for future delivery cycles.
+
+Status policy:
+
+* all items in this section are planning targets only
+* no implementation is included in this section
+* each item requires explicit approval before development starts
+
+#### Phase 1 — Near-Term (Quick Wins)
+
+1. Policy Packs
+  * predefined governance profiles (for example: strict enterprise, fast prototype, plugin-heavy)
+
+2. Decision Ledger
+  * durable record of Accept/Defer/Reject actions with rationale and impact notes
+
+3. Suggestion Rationale Viewer
+  * clear trigger explanation for each Soul recommendation
+
+4. Safety Sandbox Mode
+  * dry-run suggestion application and before/after preview before approval
+
+#### Phase 2 — Mid-Term (Governance + Scale)
+
+1. Role-Based Admin Controls
+  * owner/admin/reviewer/operator permissions for Soul actions
+
+2. Multi-Project Portfolio View
+  * cross-project dashboard for drift, gate status, and identity compliance
+
+3. Conflict Simulator
+  * pre-acceptance impact simulation for schema/task/flow conflicts
+
+4. Recovery and Rollback Bundles
+  * snapshot/restore workflow for Soul state and governance decisions
+
+#### Phase 3 — Long-Term (Adaptive Intelligence)
+
+1. Metrics and Trust Scoring
+  * track recommendation usefulness and precision over time
+
+2. Cross-Project Pattern Library
+  * promote accepted patterns into reusable governed modules
+
+3. Plugin Contract Validator
+  * validate extension contracts and plugin-specific Soul identity compliance
+
+4. Environment-Aware Execution Policy
+  * different Soul strictness by environment (dev/staging/prod)
+
+Roadmap operating rule:
+
+* prioritize Phase 1 items first unless a critical enterprise need requires Phase 2 acceleration
+* keep the master system lightweight while adding governance depth incrementally
+* every approved roadmap item must update this master document and relevant Soul identity metadata
