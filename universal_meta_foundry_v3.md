@@ -1836,3 +1836,254 @@ Current repository state after initialization:
 
 * new files are untracked until first commit
 * ready for initial commit workflow
+
+### 26.13 Frontend-First Prototype Baseline
+
+Date: 2026-03-12
+
+Prototype objective executed:
+
+* start with frontend-first visible result before deeper scaffold expansion
+
+Implemented prototype artifacts:
+
+* `web/index.html` (prototype UI shell)
+* `web/styles.css` (visual style system, mobile-responsive layout)
+* `web/app.js` (mode switching and plan packet preview behavior)
+
+Backend routing integration:
+
+* root route `/` serves the prototype page
+* static assets served from `/web`
+* existing `/health` endpoint preserved
+
+Verification completed:
+
+* automated tests: `2 passed` (`pytest -q`)
+* live root check: HTTP `200` with HTML response from `/`
+
+Operating note:
+
+* keep expanding from this prototype surface using minimal-first policy before enabling deeper generation layers
+
+### 26.14 Editable Domain Form (Prototype Step)
+
+Date: 2026-03-12
+
+Frontend prototype expansion completed:
+
+* added Domain Draft form to the UI for live metadata shaping
+* fields included: domain name, client, prototype goal, notes
+* plan packet preview now updates live as form values change
+
+Files updated for this step:
+
+* `web/index.html`
+* `web/styles.css`
+* `web/app.js`
+* `tests/test_main.py`
+
+Verification completed:
+
+* automated tests: `2 passed` (`pytest -q`)
+* live check on alternate port due to local port conflict:
+  * HTTP `200` from `/` on `127.0.0.1:8001`
+  * response contains `Domain Draft`
+
+### 26.15 Editable Tasks and State Filter (Prototype Step)
+
+Date: 2026-03-12
+
+Frontend prototype expansion completed:
+
+* added Task Board with editable task rows
+* each task row includes editable title and state selector (`todo`, `planned`, `done`)
+* added state filter chips to switch active generation state
+* packet preview now includes only tasks matching the selected state filter
+
+Files updated for this step:
+
+* `web/index.html`
+* `web/styles.css`
+* `web/app.js`
+* `tests/test_main.py`
+
+Verification completed:
+
+* automated tests: `2 passed` (`pytest -q`)
+* live check on `127.0.0.1:8001`:
+  * HTTP `200` from `/`
+  * response contains `Task Board`
+  * response contains `data-filter="todo"`
+
+### 26.16 Task Priority and Remove Actions (Prototype Step)
+
+Date: 2026-03-12
+
+Frontend prototype expansion completed:
+
+* task rows now include a priority selector (`high`, `medium`, `low`)
+* task rows now include a remove action
+* selected task list now shows priority as part of each visible task
+* packet preview now includes filtered task objects with `title`, `state`, and `priority`
+
+Files updated for this step:
+
+* `web/app.js`
+* `web/styles.css`
+* `tests/test_main.py`
+
+Verification completed:
+
+* automated tests: `2 passed` (`pytest -q`)
+* live check on `127.0.0.1:8001`:
+  * HTTP `200` from `/`
+  * response contains `Add Task`
+  * response contains `data-filter="done"`
+
+### 26.17 Local Draft Persistence and Reset (Prototype Step)
+
+Date: 2026-03-12
+
+Frontend prototype expansion completed:
+
+* added local browser draft persistence for domain fields, mode/filter selection, and task model
+* draft is auto-saved during task/domain edits
+* page reload now restores prior prototype state
+* added `Reset Draft` control to clear persisted state and restore defaults
+
+Files updated for this step:
+
+* `web/index.html`
+* `web/styles.css`
+* `web/app.js`
+* `tests/test_main.py`
+
+Verification completed:
+
+* automated tests: `2 passed` (`pytest -q`)
+* live check on `127.0.0.1:8001`:
+  * HTTP `200` from `/`
+  * response contains `Reset Draft`
+  * response contains `Task Board`
+
+### 26.18 Draft Export/Import JSON (Prototype Step)
+
+Date: 2026-03-12
+
+Frontend prototype expansion completed:
+
+* added `Export JSON` to download the current draft model
+* added `Import JSON` to load a draft file and rehydrate UI state
+* import/export covers: domain fields, mode, state filter, and task model
+* added inline status feedback for export/import/reset actions
+
+Files updated for this step:
+
+* `web/index.html`
+* `web/styles.css`
+* `web/app.js`
+* `tests/test_main.py`
+
+Verification completed:
+
+* automated tests: `2 passed` (`pytest -q`)
+* live check on `127.0.0.1:8001`:
+  * HTTP `200` from `/`
+  * response contains `Export JSON`
+  * response contains `Import JSON`
+
+### 26.19 Draft Schema Versioning and Compatibility (Prototype Step)
+
+Date: 2026-03-12
+
+Frontend prototype expansion completed:
+
+* export payload now includes `schema_version`
+* current export schema set to version `2`
+* import flow remains backward-compatible with legacy payloads that have no `schema_version` (treated as v1)
+* v1 import also accepts legacy domain key `prototype_goal` and normalizes to current internal shape
+
+Files updated for this step:
+
+* `web/app.js`
+
+Verification completed:
+
+* automated tests: `2 passed` (`pytest -q`)
+* static verification confirms `schema_version` is present in draft payload builder
+
+### 26.20 Visible Schema Badge (Prototype Step)
+
+Date: 2026-03-12
+
+Frontend prototype expansion completed:
+
+* added visible schema badge in Task Board header
+* badge text is bound to the active draft schema constant in frontend logic
+* current displayed value: `Schema v2`
+
+Files updated for this step:
+
+* `web/index.html`
+* `web/styles.css`
+* `web/app.js`
+* `tests/test_main.py`
+
+Verification completed:
+
+* automated tests: `2 passed` (`pytest -q`)
+* live check on `127.0.0.1:8001`:
+  * HTTP `200` from `/`
+  * response contains `Schema v2`
+  * response contains `Task Board`
+
+### 26.21 Schema Compatibility Tooltip (Prototype Step)
+
+Date: 2026-03-12
+
+Frontend prototype expansion completed:
+
+* added schema badge tooltip that explains compatibility behavior
+* tooltip message is generated from frontend schema constant
+* current tooltip text indicates: `v2 native, v1 import supported`
+
+Files updated for this step:
+
+* `web/index.html`
+* `web/app.js`
+* `tests/test_main.py`
+
+Verification completed:
+
+* automated tests: `2 passed` (`pytest -q`)
+* live check on `127.0.0.1:8001`:
+  * HTTP `200` from `/`
+  * response contains `Schema v2`
+  * response contains `v1 import supported`
+
+### 26.22 Interactive Schema Help Panel (Prototype Step)
+
+Date: 2026-03-12
+
+Frontend prototype expansion completed:
+
+* added interactive info button next to schema badge
+* info button toggles a schema compatibility help panel (mobile-friendly)
+* panel explains native v2 export and v1 import normalization behavior
+* Escape key closes the panel for quick keyboard dismissal
+
+Files updated for this step:
+
+* `web/index.html`
+* `web/styles.css`
+* `web/app.js`
+* `tests/test_main.py`
+
+Verification completed:
+
+* automated tests: `2 passed` (`pytest -q`)
+* live check on `127.0.0.1:8001`:
+  * HTTP `200` from `/`
+  * response contains `schemaInfoBtn`
+  * response contains `Schema compatibility:`

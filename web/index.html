@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Universal Meta-Foundry Prototype</title>
+    <link rel="stylesheet" href="/web/styles.css" />
+  </head>
+  <body>
+    <div class="ambient ambient-left" aria-hidden="true"></div>
+    <div class="ambient ambient-right" aria-hidden="true"></div>
+
+    <main class="shell">
+      <header class="hero">
+        <p class="eyebrow">Prototype Mode</p>
+        <h1>Universal Meta-Foundry</h1>
+        <p class="subtitle">
+          Frontend-first domain shaping surface with minimal structure and live phase switching.
+        </p>
+      </header>
+
+      <section class="panel controls" aria-label="Planning controls">
+        <h2>Planning Mode</h2>
+        <div class="mode-grid" id="modeGrid">
+          <button type="button" class="mode-btn active" data-mode="prototype">Prototype</button>
+          <button type="button" class="mode-btn" data-mode="growth">Growth</button>
+          <button type="button" class="mode-btn" data-mode="hardening">Hardening</button>
+        </div>
+        <p id="modeSummary" class="mode-summary"></p>
+      </section>
+
+      <section class="panel" aria-label="Domain shaping form">
+        <h2>Domain Draft</h2>
+        <div class="form-grid">
+          <label class="field">
+            <span>Domain Name</span>
+            <input id="domainName" type="text" value="Universal Meta-Foundry" />
+          </label>
+          <label class="field">
+            <span>Client</span>
+            <input id="clientName" type="text" value="internal" />
+          </label>
+          <label class="field field-wide">
+            <span>Prototype Goal</span>
+            <input
+              id="prototypeGoal"
+              type="text"
+              value="Shape frontend interaction before deep scaffold expansion"
+            />
+          </label>
+          <label class="field field-wide">
+            <span>Notes</span>
+            <textarea id="domainNotes" rows="3">Focus on minimal-first visual planning with explicit phase gates.</textarea>
+          </label>
+        </div>
+      </section>
+
+      <section class="panel split">
+        <div>
+          <h2>Current Gate</h2>
+          <p id="gateName" class="gate-name"></p>
+          <ul id="checks" class="checklist"></ul>
+        </div>
+        <div>
+          <h2>Selected Tasks</h2>
+          <ul id="tasks" class="task-list"></ul>
+        </div>
+      </section>
+
+      <section class="panel" aria-label="Task board">
+        <div class="task-header">
+          <h2>
+            Task Board
+            <span
+              id="schemaBadge"
+              class="schema-badge"
+              title="Draft schema compatibility: v2 native, v1 import supported"
+              >Schema v2</span
+            >
+            <button
+              id="schemaInfoBtn"
+              type="button"
+              class="info-icon"
+              aria-expanded="false"
+              aria-controls="schemaInfoPanel"
+              title="Show schema compatibility details"
+              >i</button
+            >
+          </h2>
+          <div class="task-actions">
+            <button id="addTaskBtn" type="button" class="mode-btn task-add-btn">Add Task</button>
+            <button id="exportDraftBtn" type="button" class="ghost-btn">Export JSON</button>
+            <button id="importDraftBtn" type="button" class="ghost-btn">Import JSON</button>
+            <button id="resetDraftBtn" type="button" class="ghost-btn">Reset Draft</button>
+            <input id="importDraftInput" type="file" accept="application/json" hidden />
+          </div>
+        </div>
+        <div id="schemaInfoPanel" class="schema-info" hidden>
+          <strong>Schema compatibility:</strong> v2 native export format. v1 draft imports are accepted and normalized.
+        </div>
+        <p id="draftStatus" class="draft-status" role="status" aria-live="polite"></p>
+        <div id="stateFilter" class="state-filter" role="group" aria-label="Task state filter">
+          <button type="button" class="chip active" data-filter="todo">todo</button>
+          <button type="button" class="chip" data-filter="planned">planned</button>
+          <button type="button" class="chip" data-filter="done">done</button>
+        </div>
+        <div id="taskBoard" class="task-board"></div>
+      </section>
+
+      <section class="panel">
+        <h2>Generated Plan Packet Preview</h2>
+        <pre id="packet" class="packet"></pre>
+      </section>
+    </main>
+
+    <script src="/web/app.js" defer></script>
+  </body>
+</html>
