@@ -1,0 +1,11 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"remote.WSL.defaultDistro": "Ubuntu-24.04-universal-meta-foundry",
+		"python.defaultInterpreterPath": "C:/universal-meta-foundry/.venv/Scripts/python.exe"
+	}
+}
