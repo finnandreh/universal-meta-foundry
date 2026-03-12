@@ -2,7 +2,7 @@
   "schema_version": 1,
   "client": "finn",
   "project": "esp32metstest",
-  "platform": "esp-idf",
+  "platform": "platformio+esp-idf",
   "target": "esp32",
   "status": "start",
   "tasks": [
@@ -45,6 +45,12 @@
     {
       "id": "espm-007",
       "title": "Validate board pin compatibility and adjust mappings",
+      "state": "done",
+      "priority": "high"
+    },
+    {
+      "id": "espm-008",
+      "title": "Set up PlatformIO folder and runtime entrypoint",
       "state": "done",
       "priority": "high"
     }

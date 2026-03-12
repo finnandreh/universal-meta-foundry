@@ -26,16 +26,6 @@
           "role": "governance_reference"
         }
       ]
-    },
-    {
-      "project_path": "clients/test/systems/intake-project",
-      "templates": [
-        {
-          "template_id": "soul.identity.template",
-          "version": "1.0.0",
-          "role": "governance_reference"
-        }
-      ]
     }
   ]
 }

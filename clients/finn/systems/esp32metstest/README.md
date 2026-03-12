@@ -64,6 +64,7 @@ Implemented first executable step:
 - ESP-IDF scaffold with serial command runtime for:
   - 2 digital outputs (`DIGITAL_GPIOS`: GPIO 2, GPIO 4)
   - 8 PWM outputs (`PWM_GPIOS`: GPIO 13, 14, 15, 16, 17, 18, 19, 21)
+- PlatformIO scaffold with equivalent serial command runtime in `src/main.cpp`
 - Serial commands:
   - `dig <index_0_to_1> <0_or_1>`
   - `pwm <channel_0_to_7> <duty_0_to_4095> <freq_hz_100_to_40000>`
@@ -77,6 +78,21 @@ From this project folder:
 1. `idf.py set-target esp32`
 2. `idf.py build`
 3. `idf.py flash monitor`
+
+## Build (PlatformIO)
+
+From this project folder:
+
+1. `pio run`
+2. `pio run -t upload`
+3. `pio device monitor -b 115200`
+
+PlatformIO config:
+
+- `platformio.ini` uses:
+  - platform: `espressif32`
+  - board: `esp32dev`
+  - framework: `arduino`
 
 ## Start-Ready Todo Plan
 
