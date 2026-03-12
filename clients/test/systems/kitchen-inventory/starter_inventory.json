@@ -1,0 +1,13 @@
+{
+  "low_stock_threshold": 2,
+  "items": [
+    { "name": "Rice", "category": "Pantry", "quantity": 1, "unit": "bag", "status": "ok" },
+    { "name": "Pasta", "category": "Pantry", "quantity": 2, "unit": "boxes", "status": "ok" },
+    { "name": "Canned Beans", "category": "Pantry", "quantity": 3, "unit": "cans", "status": "ok" },
+    { "name": "Olive Oil", "category": "Pantry", "quantity": 1, "unit": "bottle", "status": "low" },
+    { "name": "Eggs", "category": "Fridge", "quantity": 6, "unit": "count", "status": "ok" },
+    { "name": "Milk", "category": "Fridge", "quantity": 1, "unit": "carton", "status": "low" },
+    { "name": "Frozen Vegetables", "category": "Freezer", "quantity": 2, "unit": "bags", "status": "ok" },
+    { "name": "Black Pepper", "category": "Spices", "quantity": 1, "unit": "jar", "status": "ok" }
+  ]
+}

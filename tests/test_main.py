@@ -10,7 +10,10 @@ def test_root_serves_frontend_prototype() -> None:
     assert response.status_code == 200
     assert "text/html" in response.headers["content-type"]
     assert "Universal Meta-Foundry" in response.text
+    assert "Workspace Mode" in response.text
+    assert "Simple Task Mode" in response.text
     assert "View Mode" in response.text
+    assert "Planning Phase" in response.text
     assert "User View" in response.text
     assert "Technical View" in response.text
     assert "Soul Brain" in response.text
@@ -23,6 +26,14 @@ def test_root_serves_frontend_prototype() -> None:
     assert "Disabled Capabilities" in response.text
     assert "Evolution Inbox" in response.text
     assert "Domain Draft" in response.text
+    assert "Simple Project Intake" in response.text
+    assert "Client Name" in response.text
+    assert "Project Name" in response.text
+    assert "Description" in response.text
+    assert "Send To Process" in response.text
+    assert "Copy Copilot Task Request" in response.text
+    assert "Copilot Protocol Text (paste in chat)" in response.text
+    assert "Refresh Real Project Listing" in response.text
     assert "Setup Catalog" in response.text
     assert "Apply Client Catalog" in response.text
     assert "Apply Project Catalog" in response.text
@@ -65,3 +76,17 @@ def test_health_endpoint_returns_ok() -> None:
 
     assert response.status_code == 200
     assert response.json() == {"status": "ok"}
+
+
+def test_real_projects_listing_endpoint_returns_rows() -> None:
+    client = TestClient(app)
+    response = client.get("/api/projects/list")
+
+    assert response.status_code == 200
+    payload = response.json()
+    assert "projects" in payload
+    assert isinstance(payload["projects"], list)
+    assert any(
+        row.get("client") == "test" and row.get("project") == "kitchen-inventory"
+        for row in payload["projects"]
+    )

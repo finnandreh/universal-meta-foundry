@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kitchen Inventory</title>
+    <link rel="stylesheet" href="/web/styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <header class="hero">
+        <h1>Kitchen Inventory</h1>
+        <p>Simple tracker for pantry and fridge items with low-stock filtering.</p>
+      </header>
+
+      <section class="panel split">
+        <div>
+          <h2>Add Item</h2>
+          <form id="itemForm" class="form-grid">
+            <label>
+              Name
+              <input id="name" required />
+            </label>
+            <label>
+              Category
+              <input id="category" required />
+            </label>
+            <label>
+              Quantity
+              <input id="quantity" type="number" min="0" value="1" required />
+            </label>
+            <label>
+              Unit
+              <input id="unit" value="count" required />
+            </label>
+            <button type="submit">Add Item</button>
+          </form>
+        </div>
+
+        <div>
+          <h2>Filters</h2>
+          <div class="filters">
+            <label>
+              Status
+              <select id="statusFilter">
+                <option value="all">all</option>
+                <option value="ok">ok</option>
+                <option value="low">low</option>
+                <option value="out">out</option>
+              </select>
+            </label>
+            <label class="checkbox-row">
+              <input id="lowOnly" type="checkbox" />
+              low only
+            </label>
+            <button id="refreshBtn" type="button">Refresh</button>
+          </div>
+          <p id="summary" class="summary"></p>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Items</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Category</th>
+              <th>Quantity</th>
+              <th>Unit</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="itemRows"></tbody>
+        </table>
+      </section>
+
+      <p id="statusMessage" class="status" role="status" aria-live="polite"></p>
+    </main>
+
+    <script src="/web/app.js" defer></script>
+  </body>
+</html>

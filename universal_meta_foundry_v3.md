@@ -3059,3 +3059,172 @@ Scope:
 
 * kitchen-only client/project/system defaults remain unchanged
 * this change affects initial task visibility only
+
+### 26.46 Easier Planning Mode Switching (Implemented)
+
+Date: 2026-03-12
+
+Improved mode switching in the Foundry GUI by adding a direct `Planning Phase` dropdown alongside the existing mode buttons.
+
+Behavior:
+
+* users can switch between `Prototype`, `Growth`, and `Hardening` from a single selector
+* selector stays synchronized with mode button clicks
+* mode summary, gate, checklist, and packet views refresh immediately on either control path
+
+Files updated:
+
+* `web/index.html`
+* `web/app.js`
+* `tests/test_main.py`
+
+### 26.47 Project Quick Switch and Parameter Visibility (Implemented)
+
+Date: 2026-03-12
+
+Added a dedicated `Project Quick Switch` panel in the Foundry GUI to make project context and parameter switching easier to see and apply.
+
+Behavior:
+
+* quick selectors for client, project, and sub-part are shown together in one panel
+* quick selector context summary is always visible
+* `Apply Quick Switch To Domain Draft` updates main domain selectors in one action
+* quick selectors stay synchronized when main domain client/project selectors change
+
+Files updated:
+
+* `web/index.html`
+* `web/app.js`
+* `tests/test_main.py`
+
+### 26.48 Simple Task Mode (Default) for Lower Complexity
+
+Date: 2026-03-12
+
+To reduce cognitive load for daily task setup/management, the Foundry GUI now defaults to a simplified workspace mode.
+
+Behavior:
+
+* new `Workspace Mode` selector in Planning controls:
+  * `Simple Task Mode` (default)
+  * `Advanced Foundry Mode`
+* Simple Task Mode hides advanced panels and keeps core task/project workflow focused
+* Advanced Foundry Mode reveals the full panel set for deeper governance and technical controls
+* workspace mode is persisted in draft JSON (`workspace_mode`) and restored on reload/import
+
+Outcome:
+
+* users can operate in a plain, task-first UI by default
+* advanced controls remain available on demand without losing existing functionality
+
+Files updated:
+
+* `web/index.html`
+* `web/app.js`
+* `tests/test_main.py`
+
+### 26.49 Quick Switch Removal and Project Intake Persistence Validation
+
+Date: 2026-03-12
+
+Removed stale Quick Switch wiring that was no longer part of the visible GUI flow and validated project-add persistence end to end.
+
+Behavior:
+
+* removed the `Project Quick Switch` panel from the GUI
+* removed all Quick Switch DOM bindings, helper functions, and listeners from `web/app.js`
+* kept Simple Project Intake as the primary path for adding new projects
+* validated project state save/load round trip via API test (`/api/project-state/save`, `/api/project-state/load`)
+
+Outcome:
+
+* no stale JS linkages remain for controls that are no longer rendered
+* project adding via intake remains functional and writes `project.state.json` to the expected client/project path
+
+Files updated:
+
+* `web/index.html`
+* `web/app.js`
+* `tests/test_main.py`
+* `universal_meta_foundry_v3.md`
+
+### 26.50 Single API Model + Copilot Delete Protocol
+
+Date: 2026-03-12
+
+Refactored the flow so GUI is prompt-generator-first and backend keeps only one API for real project listing.
+
+Behavior:
+
+* backend API surface reduced to one endpoint:
+  * `GET /api/projects/list`
+* removed frontend dependency on project-state save/load/delete APIs
+* Simple Project Intake now generates protocol-style Copilot text for chat paste
+* Projects List now includes:
+  * local draft status editing
+  * `Generate Delete Copilot Text` action for safe project removal via Copilot
+  * `Refresh Real Project Listing` button to verify deletion happened in filesystem
+
+Outcome:
+
+* code generation and destructive operations are delegated through explicit Copilot text prompts
+* GUI remains a generator/orchestrator surface
+* real project visibility is grounded in actual workspace folders through a single listing API
+
+Files updated:
+
+* `app/main.py`
+* `web/index.html`
+* `web/app.js`
+* `tests/test_main.py`
+* `universal_meta_foundry_v3.md`
+
+### 26.51 Per-Project Specify Prompt Button
+
+Date: 2026-03-12
+
+Added a project-level `Specify` action in the simple projects list to support customization conversations in Copilot chat.
+
+Behavior:
+
+* each project card now includes a `Specify` button
+* clicking `Specify` generates a structured customization prompt in the Copilot text panel
+* prompt instructs Copilot to:
+  * ask clarifying questions first
+  * propose a short plan
+  * implement only after user confirmation
+  * keep edits scoped to the selected project path
+* user can paste this text into chat and continue iterative customization discussion
+
+Files updated:
+
+* `web/app.js`
+* `universal_meta_foundry_v3.md`
+
+### 26.52 Stop-State Todo Gating for Specify and Start Prompts
+
+Date: 2026-03-12
+
+Prompt generation now enforces a stop-state workflow to avoid implementation while projects are paused.
+
+Behavior:
+
+* when project state is `stop`, `Specify` generates a todo-only prompt:
+  * clarifies request
+  * updates todo/documentation only
+  * explicitly blocks code implementation
+* `Start` prompt now explicitly requires:
+  * reading pending todo items
+  * completing todo items in priority order
+  * reporting progress against todo
+* `Stop` prompt now explicitly requires converting unfinished work into a clear todo list
+
+Outcome:
+
+* paused projects cannot accidentally drift into implementation
+* start/stop cycle is aligned with planned todo-driven execution
+
+Files updated:
+
+* `web/app.js`
+* `universal_meta_foundry_v3.md`

@@ -48,7 +48,9 @@ const MODE_DATA = {
 
 const modeGrid = document.getElementById("modeGrid");
 const modeSummary = document.getElementById("modeSummary");
+const simpleModeToggle = document.getElementById("simpleModeToggle");
 const viewModeSelect = document.getElementById("viewModeSelect");
+const modeSelect = document.getElementById("modeSelect");
 const soulEnabled = document.getElementById("soulEnabled");
 const soulProfile = document.getElementById("soulProfile");
 const soulRecommendationMode = document.getElementById("soulRecommendationMode");
@@ -70,6 +72,14 @@ const deliveryType = document.getElementById("deliveryType");
 const domainNotes = document.getElementById("domainNotes");
 const projectName = document.getElementById("projectName");
 const systemName = document.getElementById("systemName");
+const intakeClientName = document.getElementById("intakeClientName");
+const intakeProjectName = document.getElementById("intakeProjectName");
+const intakeDescription = document.getElementById("intakeDescription");
+const processIntakeBtn = document.getElementById("processIntakeBtn");
+const copyCopilotTaskBtn = document.getElementById("copyCopilotTaskBtn");
+const copilotTaskRequest = document.getElementById("copilotTaskRequest");
+const simpleProjectsList = document.getElementById("simpleProjectsList");
+const refreshRealProjectsBtn = document.getElementById("refreshRealProjectsBtn");
 const clientCatalog = document.getElementById("clientCatalog");
 const projectCatalog = document.getElementById("projectCatalog");
 const systemCatalog = document.getElementById("systemCatalog");
@@ -107,6 +117,7 @@ const promptPacketSummary = document.getElementById("promptPacketSummary");
 const schemaBadge = document.getElementById("schemaBadge");
 const schemaInfoBtn = document.getElementById("schemaInfoBtn");
 const schemaInfoPanel = document.getElementById("schemaInfoPanel");
+const advancedSections = Array.from(document.querySelectorAll('[data-advanced="true"]'));
 
 const DRAFT_KEY = "umf.prototypeDraft.v1";
 const DRAFT_SCHEMA_VERSION = 2;
@@ -201,7 +212,6 @@ function getDefaultSetupCatalog() {
       "Launch kitchen inventory starter"
     ],
     projects_by_client: {
-      internal: ["starter-project"],
       test: ["kitchen-inventory"]
     },
     systems_by_client_project: {
@@ -324,6 +334,41 @@ function nowIso() {
   return new Date().toISOString();
 }
 
+function getTaskStateCounts() {
+  const counts = Object.fromEntries(setupCatalog.task_states.map((state) => [state, 0]));
+  for (const item of taskModel) {
+    if (Object.hasOwn(counts, item.state)) {
+      counts[item.state] += 1;
+    }
+  }
+  return counts;
+}
+
+let realProjectRows = [];
+let realProjectListingLoaded = false;
+let realProjectListingFailed = false;
+
+async function refreshRealProjectsListing() {
+  try {
+    const response = await fetch("/api/projects/list");
+    if (!response.ok) {
+      throw new Error("Real project listing endpoint unavailable");
+    }
+
+    const payload = await response.json();
+    realProjectRows = Array.isArray(payload.projects) ? payload.projects : [];
+    realProjectListingLoaded = true;
+    realProjectListingFailed = false;
+  } catch {
+    realProjectRows = [];
+    realProjectListingLoaded = false;
+    realProjectListingFailed = true;
+    setDraftStatus("Could not load real project listing. Project panel now shows endpoint-unavailable state.");
+  }
+
+  renderSimpleProjectsList();
+}
+
 function cloneObjectOfArrays(source, fallback) {
   const out = {};
   const base = source && typeof source === "object" ? source : {};
@@ -362,13 +407,13 @@ function serializeTaskTemplates(templates) {
 
 function getProjectsForClient(client) {
   const projects = setupCatalog.projects_by_client[client];
-  return Array.isArray(projects) && projects.length > 0 ? projects : ["umf-prototype"];
+  return Array.isArray(projects) && projects.length > 0 ? projects : ["kitchen-inventory"];
 }
 
 function getSystemsForClientProject(client, project) {
   const key = makeClientProjectKey(client, project);
   const systems = setupCatalog.systems_by_client_project[key];
-  return Array.isArray(systems) && systems.length > 0 ? systems : ["core-planner"];
+  return Array.isArray(systems) && systems.length > 0 ? systems : ["core-tracker"];
 }
 
 function setSelectOptions(selectElement, values, preferredValue) {
@@ -422,6 +467,308 @@ function renderSetupDropdowns(preferredClient, preferredProject, preferredSystem
   syncProjectSystemCatalogInputs();
 }
 
+function buildCopilotTaskRequest(client, project, description) {
+  return [
+    `Protocol: Prompt Generator Only`,
+    `Action: Generate implementation code from this intake.`,
+    `Client: ${client}`,
+    `Project: ${project}`,
+    `Description: ${description}`,
+    "",
+    "Rules:",
+    "- Treat this request as code-generation only.",
+    "- Do not modify Foundry core files unless explicitly requested.",
+    "- Produce a concrete implementation task list and first executable code step.",
+    "- Return files to create/update and exact code blocks."
+  ].join("\n");
+}
+
+function buildCopilotDeleteRequest(client, project) {
+  return [
+    "Protocol: Prompt Generator Only",
+    "Action: Delete generated project from workspace.",
+    `Client: ${client}`,
+    `Project: ${project}`,
+    "",
+    "Delete target:",
+    `- clients/${client}/systems/${project}`,
+    "",
+    "Rules:",
+    "- Delete only the target project folder.",
+    "- Do not touch other clients/projects.",
+    "- After deletion, confirm removed paths.",
+    "- No Foundry core edits."
+  ].join("\n");
+}
+
+function buildCopilotSetStateRequest(client, project, system, nextStatus) {
+  if (nextStatus === "start") {
+    return [
+      "Protocol: Prompt Generator Only",
+      "Action: Start working on this project.",
+      `Client: ${client}`,
+      `Project: ${project}`,
+      `System: ${system}`,
+      "",
+      "What to do:",
+      "- Update project state to start in project files.",
+      "- Read and collect pending todo items from project docs/task files.",
+      "- Resume work by completing the pending todo items in priority order.",
+      "- Prioritize first executable step and report progress against todo.",
+      "",
+      "Rules:",
+      "- Edit only this project path.",
+      "- Do not touch Foundry core files.",
+      "- Keep JSON valid and preserve existing fields.",
+      "- Confirm exactly which files were updated."
+    ].join("\n");
+  }
+
+  if (nextStatus === "stop") {
+    return [
+      "Protocol: Prompt Generator Only",
+      "Action: Stop working on this project.",
+      `Client: ${client}`,
+      `Project: ${project}`,
+      `System: ${system}`,
+      "",
+      "What to do:",
+      "- Update all relevant project documents.",
+      "- Add current important notes and current state summary.",
+      "- Convert unfinished work into a clear todo list for next start.",
+      "- Pause any ongoing project process and mark project as stop.",
+      "",
+      "Rules:",
+      "- Edit only this project path.",
+      "- Do not touch Foundry core files.",
+      "- Keep JSON/markdown valid and preserve existing fields.",
+      "- Confirm exactly which files were updated."
+    ].join("\n");
+  }
+
+  return [
+    "Protocol: Prompt Generator Only",
+    "Action: Set project state by applying file changes in workspace.",
+    `Client: ${client}`,
+    `Project: ${project}`,
+    `System: ${system}`,
+    `New Status: ${nextStatus}`,
+    "",
+    "Update targets:",
+    `- clients/${client}/systems/${project}/project.state.json (if present)`,
+    `- clients/${client}/systems/${project}/copilot.tasks.json (optional status alignment)`,
+    "",
+    "Rules:",
+    "- Edit only this project path.",
+    "- Do not touch Foundry core files.",
+    "- Keep JSON valid and preserve existing fields.",
+    "- Confirm exactly which files were updated."
+  ].join("\n");
+}
+
+function buildCopilotCustomizeRequest(client, project, system, status) {
+  if (status === "stop") {
+    return [
+      "Protocol: Prompt Generator Only",
+      "Action: Capture customization request as todo only (project is stopped).",
+      `Client: ${client}`,
+      `Project: ${project}`,
+      `System: ${system}`,
+      `Current Status: ${status}`,
+      "",
+      "What to do:",
+      "- Ask clarifying questions to understand requested customization.",
+      "- Do not implement code changes while state is stop.",
+      "- Add/update a prioritized todo list in project docs/tasks.",
+      "- Prepare start-ready plan notes for next start action.",
+      "",
+      "Output format:",
+      "- Restate requested customization.",
+      "- Todo entries to add with priorities.",
+      "- Files updated for todo/documentation only."
+    ].join("\n");
+  }
+
+  return [
+    "Protocol: Prompt Generator Only",
+    "Action: Customize existing project behavior by user request.",
+    `Client: ${client}`,
+    `Project: ${project}`,
+    `System: ${system}`,
+    `Current Status: ${status}`,
+    "",
+    "What to do:",
+    "- Ask clarifying questions first to understand desired customization.",
+    "- Propose a short implementation plan.",
+    "- Implement only after user confirms direction.",
+    "- Keep edits scoped to this project path unless explicitly expanded.",
+    "",
+    "Output format:",
+    "- Restate requested customization.",
+    "- List files to update.",
+    "- Provide exact code changes."
+  ].join("\n");
+}
+
+function renderSimpleProjectsList() {
+  if (!simpleProjectsList) {
+    return;
+  }
+
+  simpleProjectsList.innerHTML = "";
+  if (realProjectListingFailed) {
+    const unavailable = document.createElement("article");
+    unavailable.className = "status-card";
+    unavailable.innerHTML = "<h3>Real listing unavailable</h3><p>Could not load /api/projects/list. Refresh after backend restart.</p>";
+    simpleProjectsList.appendChild(unavailable);
+    return;
+  }
+
+  if (!realProjectListingLoaded) {
+    const loading = document.createElement("article");
+    loading.className = "status-card";
+    loading.innerHTML = "<h3>Loading projects</h3><p>Fetching real project listing from workspace...</p>";
+    simpleProjectsList.appendChild(loading);
+    return;
+  }
+
+  const rows = realProjectRows.map((row) => {
+        const client = String(row.client || "test");
+        const project = String(row.project || "project");
+        const systems = Array.isArray(row.systems) ? row.systems : [];
+        const system = systems[0] || "core";
+        const key = makeProjectSystemKey(client, project, system);
+        const state = setupCatalog.project_status_by_key[key] || {
+          status: "stop",
+          phase: `${currentMode}_mode`,
+          updated_by: "user",
+          last_updated: ""
+        };
+        return { key, client, project, system, status: state.status };
+      });
+
+  if (rows.length === 0) {
+    const empty = document.createElement("article");
+    empty.className = "status-card";
+    empty.innerHTML = "<h3>No real projects found</h3><p>No project folders exist under clients/*/systems yet.</p>";
+    simpleProjectsList.appendChild(empty);
+    return;
+  }
+
+  for (const row of rows) {
+    const card = document.createElement("article");
+    card.className = "status-card";
+
+    const statusId = `status-${row.key.replace(/[^a-zA-Z0-9_-]/g, "_")}`;
+    card.innerHTML = `
+      <h3>${row.client} / ${row.project}</h3>
+      <p>Sub-part: ${row.system}</p>
+      <p>Current status: ${row.status}</p>
+      <label for="${statusId}">Set status</label>
+      <select id="${statusId}">
+        <option value="start">start</option>
+        <option value="stop">stop</option>
+      </select>
+      <div class="task-actions">
+        <button type="button" class="mode-btn" data-action="save-project-status">Generate State Copilot Text</button>
+        <button type="button" class="mode-btn" data-action="generate-specify-copilot-text">Specify</button>
+        <button type="button" class="ghost-btn" data-action="generate-delete-copilot-text">Generate Delete Copilot Text</button>
+      </div>
+    `;
+
+    const statusSelect = card.querySelector("select");
+    statusSelect.value = ["start", "stop"].includes(row.status) ? row.status : "stop";
+
+    const saveBtn = card.querySelector("button[data-action='save-project-status']");
+    saveBtn.addEventListener("click", () => {
+      const text = buildCopilotSetStateRequest(
+        row.client,
+        row.project,
+        row.system,
+        statusSelect.value
+      );
+      copilotTaskRequest.textContent = text;
+      setDraftStatus("State-change Copilot text generated. Paste in chat to apply project state changes.");
+    });
+
+    const deletePromptBtn = card.querySelector("button[data-action='generate-delete-copilot-text']");
+    deletePromptBtn.addEventListener("click", () => {
+      const text = buildCopilotDeleteRequest(row.client, row.project);
+      copilotTaskRequest.textContent = text;
+      setDraftStatus("Delete Copilot text generated. Paste it in chat, let Copilot delete, then refresh project listing.");
+    });
+
+    const specifyPromptBtn = card.querySelector("button[data-action='generate-specify-copilot-text']");
+    specifyPromptBtn.addEventListener("click", () => {
+      const text = buildCopilotCustomizeRequest(row.client, row.project, row.system, statusSelect.value);
+      copilotTaskRequest.textContent = text;
+      setDraftStatus("Customization prompt generated. Paste in chat and continue discussion with Copilot.");
+    });
+
+    simpleProjectsList.appendChild(card);
+  }
+}
+
+function processSimpleIntake() {
+  const client = intakeClientName.value.trim();
+  const project = intakeProjectName.value.trim();
+  const description = intakeDescription.value.trim();
+
+  if (!client || !project || !description) {
+    setDraftStatus("Simple intake requires client name, project name, and description.");
+    return;
+  }
+
+  const defaultSystem = "core";
+  if (!setupCatalog.clients.includes(client)) {
+    setupCatalog.clients.push(client);
+  }
+
+  if (!Array.isArray(setupCatalog.projects_by_client[client])) {
+    setupCatalog.projects_by_client[client] = [];
+  }
+
+  if (!setupCatalog.projects_by_client[client].includes(project)) {
+    setupCatalog.projects_by_client[client].push(project);
+  }
+
+  const clientProjectKey = makeClientProjectKey(client, project);
+  if (!Array.isArray(setupCatalog.systems_by_client_project[clientProjectKey])) {
+    setupCatalog.systems_by_client_project[clientProjectKey] = [];
+  }
+
+  if (!setupCatalog.systems_by_client_project[clientProjectKey].includes(defaultSystem)) {
+    setupCatalog.systems_by_client_project[clientProjectKey].push(defaultSystem);
+  }
+
+  const statusKey = makeProjectSystemKey(client, project, defaultSystem);
+  setupCatalog.project_status_by_key[statusKey] = {
+    status: "planned",
+    phase: `${currentMode}_mode`,
+    updated_by: "user",
+    last_updated: nowIso()
+  };
+
+  renderSetupDropdowns(client, project, defaultSystem, prototypeGoal.value);
+  domainName.value = project;
+  deliveryType.value = "ready_system";
+  domainNotes.value = description;
+
+  const intakeTaskTitle = `Intake: ${project} - ${description.slice(0, 80)}`;
+  taskModel.push({
+    title: intakeTaskTitle,
+    state: "planned",
+    priority: "high"
+  });
+
+  renderTaskBoard();
+  refreshDerivedViews();
+
+  const requestText = buildCopilotTaskRequest(client, project, description);
+  copilotTaskRequest.textContent = requestText;
+  setDraftStatus("Simple intake processed. Copilot protocol text generated.");
+}
+
 function renderTaskTemplateSelect(preferredIndex) {
   const selected =
     preferredIndex !== undefined ? String(preferredIndex) : String(taskTemplateSelect.value || "0");
@@ -438,7 +785,7 @@ function renderTaskTemplateSelect(preferredIndex) {
   if (setupCatalog.task_templates.length === 0) {
     const option = document.createElement("option");
     option.value = "0";
-    option.textContent = "New task [todo | medium]";
+    option.textContent = "New task [planned | medium]";
     taskTemplateSelect.appendChild(option);
   }
 
@@ -465,6 +812,11 @@ function renderStateFilterChips() {
 }
 
 function ensureSetupIntegrity() {
+  // Remove legacy placeholders so only active project paths remain visible.
+  setupCatalog.clients = setupCatalog.clients.filter((client) => client !== "internal");
+  delete setupCatalog.projects_by_client.internal;
+  delete setupCatalog.systems_by_client_project["internal/umf-prototype"];
+
   if (!setupCatalog.clients.includes(clientName.value)) {
     setupCatalog.clients.push(clientName.value || "test");
   }
@@ -473,17 +825,23 @@ function ensureSetupIntegrity() {
     if (!Array.isArray(setupCatalog.projects_by_client[client]) || setupCatalog.projects_by_client[client].length === 0) {
       setupCatalog.projects_by_client[client] = ["kitchen-inventory"];
     }
+
+    setupCatalog.projects_by_client[client] = setupCatalog.projects_by_client[client].map((project) =>
+      project === "umf-prototype" ? "kitchen-inventory" : project
+    );
+
     for (const project of setupCatalog.projects_by_client[client]) {
       const key = makeClientProjectKey(client, project);
       if (
         !Array.isArray(setupCatalog.systems_by_client_project[key]) ||
         setupCatalog.systems_by_client_project[key].length === 0
       ) {
-        setupCatalog.systems_by_client_project[key] =
-          client === "test" && project === "kitchen-inventory"
-            ? ["core-tracker"]
-            : ["core-tracker"];
+        setupCatalog.systems_by_client_project[key] = ["core-tracker"];
       }
+
+      setupCatalog.systems_by_client_project[key] = setupCatalog.systems_by_client_project[key].map((system) =>
+        system === "core-planner" ? "core-tracker" : system
+      );
 
       for (const system of setupCatalog.systems_by_client_project[key]) {
         const projectSystemKey = makeProjectSystemKey(client, project, system);
@@ -524,6 +882,7 @@ function setDefaultDomainFields() {
 
 let currentMode = "prototype";
 let currentViewMode = "user";
+let currentWorkspaceMode = "simple";
 let currentFilter = "todo";
 let taskModel = getDefaultTaskModel();
 let setupCatalog = getDefaultSetupCatalog();
@@ -531,6 +890,29 @@ let soulConfig = getDefaultSoulConfig();
 
 function setDraftStatus(message) {
   draftStatus.textContent = message;
+}
+
+function applyWorkspaceMode(mode, options = {}) {
+  const { silent = false } = options;
+  currentWorkspaceMode = mode === "advanced" ? "advanced" : "simple";
+
+  if (simpleModeToggle) {
+    simpleModeToggle.value = currentWorkspaceMode;
+  }
+
+  const hideAdvanced = currentWorkspaceMode === "simple";
+  for (const section of advancedSections) {
+    section.hidden = hideAdvanced;
+  }
+
+  if (!silent) {
+    setDraftStatus(
+      hideAdvanced
+        ? "Simple mode enabled. Advanced Foundry panels are hidden."
+        : "Advanced mode enabled. Full Foundry panels are visible."
+    );
+    persistState();
+  }
 }
 
 function applyViewMode(mode) {
@@ -705,14 +1087,14 @@ function applySuggestionAction(suggestion) {
       const title = "Cross-client reusable pattern review";
       const exists = setupCatalog.task_templates.some((item) => item.title === title);
       if (!exists) {
-        setupCatalog.task_templates.push({ title, state: "todo", priority: "medium" });
+        setupCatalog.task_templates.push({ title, state: "planned", priority: "medium" });
       }
       break;
     }
     case "add_prompt_clarity_task": {
       const exists = taskModel.some((item) => item.title === "Prompt clarity pass");
       if (!exists) {
-        taskModel.push({ title: "Prompt clarity pass", state: "todo", priority: "medium" });
+        taskModel.push({ title: "Prompt clarity pass", state: "planned", priority: "medium" });
       }
       break;
     }
@@ -827,6 +1209,7 @@ function sanitizeDraft(payload) {
   const schemaVersion = Number(payload.schema_version || 1);
   const mode = payload.mode;
   const viewMode = payload.view_mode;
+  const workspaceMode = payload.workspace_mode;
   const filter = payload.filter;
   const domain = payload.domain;
   const tasks = payload.tasks;
@@ -841,6 +1224,10 @@ function sanitizeDraft(payload) {
     typeof viewMode === "string" && ["user", "technical"].includes(viewMode)
       ? viewMode
       : "user";
+  const normalizedWorkspaceMode =
+    typeof workspaceMode === "string" && ["simple", "advanced"].includes(workspaceMode)
+      ? workspaceMode
+      : "simple";
   const normalizedFilter =
     typeof filter === "string" && ["todo", "planned", "done"].includes(filter)
       ? filter
@@ -1075,6 +1462,7 @@ function sanitizeDraft(payload) {
     schema_version: schemaVersion,
     mode: normalizedMode,
     view_mode: normalizedViewMode,
+    workspace_mode: normalizedWorkspaceMode,
     filter: normalizedFilter,
     soul: normalizedSoul,
     domain: normalizedDomain,
@@ -1088,6 +1476,7 @@ function buildDraftPayload() {
     schema_version: DRAFT_SCHEMA_VERSION,
     mode: currentMode,
     view_mode: currentViewMode,
+    workspace_mode: currentWorkspaceMode,
     filter: currentFilter,
     soul: soulConfig,
     domain: {
@@ -1116,6 +1505,7 @@ function applyDraftPayload(payload) {
   const normalized = sanitizeDraft(payload);
   currentMode = normalized.mode;
   currentViewMode = normalized.view_mode;
+  currentWorkspaceMode = normalized.workspace_mode;
   currentFilter = normalized.filter;
   setupCatalog = {
     clients: normalized.setup.clients.slice(),
@@ -1148,6 +1538,7 @@ function applyDraftPayload(payload) {
 
   setActiveModeButton(currentMode);
   applyViewMode(currentViewMode);
+  applyWorkspaceMode(currentWorkspaceMode, { silent: true });
   setActiveFilterButton(currentFilter);
   renderTaskBoard();
   updateMode(currentMode);
@@ -1832,6 +2223,7 @@ function refreshDerivedViews() {
   renderStatusFilters();
   renderProjectStatusView();
   renderCopilotReadiness();
+  renderSimpleProjectsList();
   renderPacket(currentMode, modeData);
   persistState();
 }
@@ -1839,6 +2231,8 @@ function refreshDerivedViews() {
 function updateMode(mode) {
   currentMode = mode;
   const data = MODE_DATA[mode];
+  modeSelect.value = mode;
+  setActiveModeButton(mode);
   modeSummary.textContent = data.summary;
   gateName.textContent = data.gate;
   renderList(checks, data.checks);
@@ -1851,9 +2245,18 @@ modeGrid.addEventListener("click", (event) => {
     return;
   }
 
-  setActiveModeButton(button.dataset.mode);
   updateMode(button.dataset.mode);
 });
+
+modeSelect.addEventListener("change", () => {
+  updateMode(modeSelect.value);
+});
+
+if (simpleModeToggle) {
+  simpleModeToggle.addEventListener("change", () => {
+    applyWorkspaceMode(simpleModeToggle.value);
+  });
+}
 
 stateFilter.addEventListener("click", (event) => {
   const button = event.target.closest("button[data-filter]");
@@ -1870,7 +2273,7 @@ addTaskBtn.addEventListener("click", () => {
   const selectedIndex = Number(taskTemplateSelect.value || 0);
   const selectedTemplate = setupCatalog.task_templates[selectedIndex] || {
     title: "New task",
-    state: currentFilter,
+    state: "planned",
     priority: "medium"
   };
 
@@ -1896,16 +2299,26 @@ copilotUpdateStatusBtn.addEventListener("click", () => {
   const project = statusProjectFilter.value !== "all" ? statusProjectFilter.value : projectName.value;
   const system = systemName.value;
   const key = makeProjectSystemKey(client, project, system);
+  const existing = setupCatalog.project_status_by_key[key];
+  const isFirstCopilotMark = !existing || !existing.copilot_populated;
+
+  const nextStatus = isFirstCopilotMark ? "planned" : "active";
 
   setupCatalog.project_status_by_key[key] = {
-    status: "copilot_updated",
+    ...(existing || {}),
+    status: nextStatus,
     phase: `${currentMode}_mode`,
     updated_by: "copilot",
-    last_updated: nowIso()
+    last_updated: nowIso(),
+    copilot_populated: true
   };
 
   refreshDerivedViews();
-  setDraftStatus("Project status updated by Copilot action.");
+  setDraftStatus(
+    isFirstCopilotMark
+      ? "Copilot first mark applied in draft: project status set to planned."
+      : "Project status updated by Copilot action in draft: set to active."
+  );
 });
 
 exportDraftBtn.addEventListener("click", () => {
@@ -1973,7 +2386,7 @@ applyClientCatalogBtn.addEventListener("click", () => {
 
   for (const client of setupCatalog.clients) {
     if (!setupCatalog.projects_by_client[client]) {
-      setupCatalog.projects_by_client[client] = ["umf-prototype"];
+      setupCatalog.projects_by_client[client] = ["kitchen-inventory"];
     }
   }
 
@@ -1989,7 +2402,7 @@ applyProjectCatalogBtn.addEventListener("click", () => {
   const selectedTemplate = prototypeGoal.value;
 
   setupCatalog.projects_by_client[selectedClient] = parseCatalogText(projectCatalog.value, [
-    "umf-prototype"
+    "kitchen-inventory"
   ]);
 
   renderSetupDropdowns(selectedClient, selectedProject, selectedSystem, selectedTemplate);
@@ -2005,7 +2418,7 @@ applySystemCatalogBtn.addEventListener("click", () => {
   const key = makeClientProjectKey(selectedClient, selectedProject);
 
   setupCatalog.systems_by_client_project[key] = parseCatalogText(systemCatalog.value, [
-    "core-planner"
+    "core-tracker"
   ]);
 
   renderSetupDropdowns(selectedClient, selectedProject, selectedSystem, selectedTemplate);
@@ -2191,6 +2604,27 @@ projectName.addEventListener("change", () => {
   refreshDerivedViews();
 });
 
+if (processIntakeBtn && copyCopilotTaskBtn && copilotTaskRequest) {
+  processIntakeBtn.addEventListener("click", () => {
+    processSimpleIntake();
+  });
+
+  copyCopilotTaskBtn.addEventListener("click", async () => {
+    const text = copilotTaskRequest.textContent || "";
+    if (!text.trim()) {
+      setDraftStatus("No Copilot task request to copy yet.");
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(text);
+      setDraftStatus("Copilot task request copied.");
+    } catch {
+      setDraftStatus("Copy failed. Select and copy the request text manually.");
+    }
+  });
+}
+
 for (const select of [statusClientFilter, statusProjectFilter, statusStateFilter]) {
   select.addEventListener("change", () => {
     renderStatusFilters();
@@ -2199,13 +2633,22 @@ for (const select of [statusClientFilter, statusProjectFilter, statusStateFilter
   });
 }
 
+if (refreshRealProjectsBtn) {
+  refreshRealProjectsBtn.addEventListener("click", async () => {
+    await refreshRealProjectsListing();
+    setDraftStatus("Real project listing refreshed.");
+  });
+}
+
 setDefaultDomainFields();
 loadPersistedState();
 applyViewMode(currentViewMode);
+applyWorkspaceMode(currentWorkspaceMode, { silent: true });
 syncSoulInputsFromConfig();
 runEvolutionScan();
 renderEvolutionInbox();
 setActiveModeButton(currentMode);
 renderTaskBoard();
 updateMode(currentMode);
+refreshRealProjectsListing();
 setDraftStatus("Draft ready.");

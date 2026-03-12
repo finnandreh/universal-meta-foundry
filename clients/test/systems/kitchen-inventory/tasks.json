@@ -1,0 +1,33 @@
+{
+  "task_states": ["todo", "planned", "done"],
+  "tasks": [
+    {
+      "id": "task_000",
+      "title": "Enforce generation boundary policy",
+      "state": "done",
+      "priority": "high",
+      "notes": "This system must never modify Foundry core files (web/app.js, soul.identity.json, universal_meta_foundry_v3.md). Changes are allowed only under clients/test/systems/kitchen-inventory."
+    },
+    {
+      "id": "task_001",
+      "title": "Create pantry baseline list",
+      "state": "done",
+      "priority": "medium",
+      "notes": "Starter inventory seeded in starter_inventory.json"
+    },
+    {
+      "id": "task_002",
+      "title": "Add item form and list view",
+      "state": "done",
+      "priority": "high",
+      "notes": "Implemented in web/index.html + web/app.js with Add Item form and table rendering."
+    },
+    {
+      "id": "task_003",
+      "title": "Implement low-stock filter",
+      "state": "done",
+      "priority": "medium",
+      "notes": "Implemented low_only API filter and UI toggle for low/out item views."
+    }
+  ]
+}

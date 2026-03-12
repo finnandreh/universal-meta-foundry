@@ -47,5 +47,24 @@
       "out"
     ]
   },
+  "project_lifecycle": {
+    "allowed_statuses": [
+      "planned",
+      "active",
+      "paused",
+      "done"
+    ],
+    "current_status": "active",
+    "current_working_on": "Implement and refine the simple project intake and status management flow.",
+    "completed": [
+      "Created kitchen inventory identity baseline",
+      "Defined starter defaults and inventory status values"
+    ],
+    "next_up": [
+      "Keep GUI and status settings aligned",
+      "Promote active work to done when validated"
+    ],
+    "last_updated": "2026-03-12"
+  },
   "created_at": "2026-03-12"
 }

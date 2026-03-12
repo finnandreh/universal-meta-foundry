@@ -1,0 +1,32 @@
+{
+  "manifest_version": 1,
+  "id": "kitchen-inventory-test-v1",
+  "name": "Kitchen Inventory",
+  "project_role": "ready_system",
+  "project_type": "web_tracker",
+  "purpose": "Track kitchen items with low-stock visibility and simple shopping follow-up.",
+  "operating_model": {
+    "mode": "single_user_local_first",
+    "workflow": [
+      "add_item",
+      "update_quantity",
+      "set_status",
+      "review_low_stock"
+    ]
+  },
+  "instruction_scope": {
+    "copilot_scope": "this_generated_project_only",
+    "in_scope": [
+      "inventory_crud",
+      "low_stock_rules",
+      "json_import_export",
+      "simple_status_dashboard"
+    ],
+    "out_of_scope": [
+      "multi_user_auth",
+      "payments",
+      "cloud_deployment_automation"
+    ]
+  },
+  "created_at": "2026-03-12"
+}

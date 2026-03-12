@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "client": "test",
+  "project": "intake-project",
+  "systems": {
+    "core": {
+      "status": "active",
+      "phase": "prototype_mode",
+      "updated_by": "copilot",
+      "task_state_counts": {
+        "planned": 2,
+        "active": 0,
+        "paused": 0,
+        "done": 0
+      }
+    }
+  }
+}

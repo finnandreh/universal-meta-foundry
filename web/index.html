@@ -15,17 +15,32 @@
         <p class="eyebrow">Prompt Draft Mode</p>
         <h1>Universal Meta-Foundry</h1>
         <p class="subtitle">
-          Frontend-first prompt drafting surface for planning now and running Copilot later.
+          Prompt generator only. Write code instructions in chat; paste generated Copilot text into chat.
         </p>
       </header>
 
-      <section class="panel controls" aria-label="Planning controls">
+      <section class="panel controls" aria-label="Planning controls" data-advanced="true">
         <h2>Planning Mode</h2>
+        <label class="field" for="simpleModeToggle">
+          <span>Workspace Mode</span>
+          <select id="simpleModeToggle">
+            <option value="simple">Simple Task Mode</option>
+            <option value="advanced">Advanced Foundry Mode</option>
+          </select>
+        </label>
         <label class="field" for="viewModeSelect">
           <span>View Mode</span>
           <select id="viewModeSelect">
             <option value="user">User View</option>
             <option value="technical">Technical View</option>
+          </select>
+        </label>
+        <label class="field" for="modeSelect">
+          <span>Planning Phase</span>
+          <select id="modeSelect">
+            <option value="prototype">Prototype</option>
+            <option value="growth">Growth</option>
+            <option value="hardening">Hardening</option>
           </select>
         </label>
         <div class="mode-grid" id="modeGrid">
@@ -36,7 +51,7 @@
         <p id="modeSummary" class="mode-summary"></p>
       </section>
 
-      <section class="panel" aria-label="Soul Brain controls">
+      <section class="panel" aria-label="Soul Brain controls" data-advanced="true">
         <h2>Soul Brain</h2>
         <p class="mode-summary">
           Lightweight intelligence profile for suggestion behavior and governance across this Foundry and derived Foundries.
@@ -91,7 +106,7 @@ inheritance_auditor</textarea>
         </div>
       </section>
 
-      <section class="panel" aria-label="Evolution inbox">
+      <section class="panel" aria-label="Evolution inbox" data-advanced="true">
         <h2>Evolution Inbox</h2>
         <p class="mode-summary">
           Soul Brain suggestions are recommendation-first. Review and decide per item.
@@ -99,7 +114,7 @@ inheritance_auditor</textarea>
         <div id="evolutionInbox" class="status-board"></div>
       </section>
 
-      <section class="panel" aria-label="Setup catalog">
+      <section class="panel" aria-label="Setup catalog" data-advanced="true">
         <h2>Setup Catalog</h2>
         <p class="mode-summary">
           Configure reusable dropdown sources in order: client, project, sub-part, then task states and task templates. These values are saved in the JSON draft.
@@ -152,7 +167,43 @@ done</textarea>
         </div>
       </section>
 
-      <section class="panel" aria-label="Domain shaping form">
+      <section class="panel" aria-label="Simple project intake">
+        <h2>Simple Project Intake</h2>
+        <p class="mode-summary">Create a new project and generate protocol-based Copilot text to paste in chat.</p>
+        <div class="form-grid">
+          <label class="field">
+            <span>Client Name</span>
+            <input id="intakeClientName" type="text" placeholder="example-client" />
+          </label>
+          <label class="field">
+            <span>Project Name</span>
+            <input id="intakeProjectName" type="text" placeholder="example-project" />
+          </label>
+          <label class="field field-wide">
+            <span>Description</span>
+            <textarea id="intakeDescription" rows="4" placeholder="Describe what the project should do and what task Copilot should build."></textarea>
+          </label>
+          <div class="task-actions field-wide">
+            <button id="processIntakeBtn" type="button" class="mode-btn">Send To Process</button>
+            <button id="copyCopilotTaskBtn" type="button" class="ghost-btn">Copy Copilot Task Request</button>
+          </div>
+          <label class="field field-wide">
+            <span>Copilot Protocol Text (paste in chat)</span>
+            <pre id="copilotTaskRequest" class="packet"></pre>
+          </label>
+        </div>
+      </section>
+
+      <section class="panel" aria-label="Simple project list">
+        <h2>Projects List</h2>
+        <p class="mode-summary">View projects, update status, or delete a project.</p>
+        <div class="task-actions">
+          <button id="refreshRealProjectsBtn" type="button" class="ghost-btn">Refresh Real Project Listing</button>
+        </div>
+        <div id="simpleProjectsList" class="status-board"></div>
+      </section>
+
+      <section class="panel" aria-label="Domain shaping form" data-advanced="true">
         <h2>Domain Draft</h2>
         <div class="form-grid">
           <label class="field">
@@ -189,13 +240,13 @@ done</textarea>
         </div>
       </section>
 
-      <section class="panel" aria-label="Prompt structure preview">
+      <section class="panel" aria-label="Prompt structure preview" data-advanced="true">
         <h2>Prompt Structure Preview</h2>
         <p class="mode-summary">Generated from current domain, client, project, and system values.</p>
         <pre id="promptStructurePreview" class="packet scaffold-preview"></pre>
       </section>
 
-      <section class="panel split">
+      <section class="panel split" data-advanced="true">
         <div>
           <h2>Current Gate</h2>
           <p id="gateName" class="gate-name"></p>
@@ -207,7 +258,7 @@ done</textarea>
         </div>
       </section>
 
-      <section class="panel" aria-label="Task board">
+      <section class="panel" aria-label="Task board" data-advanced="true">
         <div class="task-header">
           <h2>
             Task Board
@@ -248,7 +299,7 @@ done</textarea>
         <div id="taskBoard" class="task-board"></div>
       </section>
 
-      <section class="panel" aria-label="Project status explorer">
+      <section class="panel" aria-label="Project status explorer" data-advanced="true">
         <h2>Project Status Explorer</h2>
         <p class="mode-summary">Filter project status by client, project, and task state. Copilot status updates are tracked in JSON.</p>
         <div class="form-grid">
@@ -277,7 +328,7 @@ done</textarea>
         </details>
       </section>
 
-      <section class="panel" aria-label="Project bundle manager">
+      <section class="panel" aria-label="Project bundle manager" data-advanced="true">
         <h2>Project Bundle Manager</h2>
         <p class="mode-summary">Export a full project bundle from Foundry and merge it back later when the client returns with new scope.</p>
         <div class="task-actions">
@@ -287,7 +338,7 @@ done</textarea>
         </div>
       </section>
 
-      <section class="panel">
+      <section class="panel" data-advanced="true">
         <h2>Generated Prompt Packet Preview</h2>
         <div id="promptPacketSummary" class="status-board"></div>
         <details class="details-panel">
@@ -296,7 +347,7 @@ done</textarea>
         </details>
       </section>
 
-      <section class="panel" aria-label="Copilot handoff readiness">
+      <section class="panel" aria-label="Copilot handoff readiness" data-advanced="true">
         <h2>Ready for Copilot Handoff</h2>
         <p class="mode-summary">Use this gate to confirm the prompt packet is complete before execution.</p>
         <ul id="copilotReadiness" class="checklist readiness-list"></ul>
