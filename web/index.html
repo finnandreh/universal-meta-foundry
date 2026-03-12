@@ -12,21 +12,148 @@
 
     <main class="shell">
       <header class="hero">
-        <p class="eyebrow">Prototype Mode</p>
+        <p class="eyebrow">Prompt Draft Mode</p>
         <h1>Universal Meta-Foundry</h1>
         <p class="subtitle">
-          Frontend-first domain shaping surface with minimal structure and live phase switching.
+          Frontend-first prompt drafting surface for planning now and running Copilot later.
         </p>
       </header>
 
       <section class="panel controls" aria-label="Planning controls">
         <h2>Planning Mode</h2>
+        <label class="field" for="viewModeSelect">
+          <span>View Mode</span>
+          <select id="viewModeSelect">
+            <option value="user">User View</option>
+            <option value="technical">Technical View</option>
+          </select>
+        </label>
         <div class="mode-grid" id="modeGrid">
           <button type="button" class="mode-btn active" data-mode="prototype">Prototype</button>
           <button type="button" class="mode-btn" data-mode="growth">Growth</button>
           <button type="button" class="mode-btn" data-mode="hardening">Hardening</button>
         </div>
         <p id="modeSummary" class="mode-summary"></p>
+      </section>
+
+      <section class="panel" aria-label="Soul Brain controls">
+        <h2>Soul Brain</h2>
+        <p class="mode-summary">
+          Lightweight intelligence profile for suggestion behavior and governance across this Foundry and derived Foundries.
+        </p>
+        <div class="form-grid">
+          <label class="field" for="soulEnabled">
+            <span>Soul Enabled</span>
+            <select id="soulEnabled">
+              <option value="true">Enabled</option>
+              <option value="false">Disabled</option>
+            </select>
+          </label>
+          <label class="field" for="soulProfile">
+            <span>Soul Profile</span>
+            <select id="soulProfile">
+              <option value="light">light</option>
+              <option value="standard">standard</option>
+              <option value="extended">extended</option>
+            </select>
+          </label>
+          <label class="field" for="soulRecommendationMode">
+            <span>Recommendation Mode</span>
+            <select id="soulRecommendationMode">
+              <option value="suggest_only">suggest_only</option>
+              <option value="guided_apply">guided_apply</option>
+            </select>
+          </label>
+          <label class="field" for="soulMaxSuggestions">
+            <span>Learning Budget: Max Suggestions Per Cycle</span>
+            <input id="soulMaxSuggestions" type="number" min="1" max="20" step="1" value="5" />
+          </label>
+          <label class="field field-wide" for="soulPrinciplesAnchor">
+            <span>Principles Anchor</span>
+            <input id="soulPrinciplesAnchor" type="text" value="foundry_v2_core_principles" />
+          </label>
+          <label class="field field-wide" for="soulInheritanceSource">
+            <span>Inheritance Source</span>
+            <input id="soulInheritanceSource" type="text" value="universal-meta-foundry@v2" />
+          </label>
+          <label class="field field-wide" for="soulCapabilitiesEnabled">
+            <span>Enabled Capabilities (one key per line)</span>
+            <textarea id="soulCapabilitiesEnabled" rows="5">pattern_miner
+drift_guard
+learning_budget_controller
+explainability_narrator</textarea>
+          </label>
+          <label class="field field-wide" for="soulCapabilitiesDisabled">
+            <span>Disabled Capabilities (one key per line)</span>
+            <textarea id="soulCapabilitiesDisabled" rows="3">plugin_fitness_advisor
+inheritance_auditor</textarea>
+          </label>
+        </div>
+      </section>
+
+      <section class="panel" aria-label="Evolution inbox">
+        <h2>Evolution Inbox</h2>
+        <p class="mode-summary">
+          Soul Brain suggestions are recommendation-first. Review and decide per item.
+        </p>
+        <div id="evolutionInbox" class="status-board"></div>
+      </section>
+
+      <section class="panel" aria-label="Setup catalog">
+        <h2>Setup Catalog</h2>
+        <p class="mode-summary">
+          Configure reusable dropdown sources in order: client, project, sub-part, then task states and task templates. These values are saved in the JSON draft.
+        </p>
+        <div class="form-grid">
+          <label class="field field-wide">
+            <span>Client Catalog (one value per line)</span>
+            <textarea id="clientCatalog" rows="3">internal</textarea>
+          </label>
+          <div class="task-actions field-wide">
+            <button id="applyClientCatalogBtn" type="button" class="mode-btn">Apply Client Catalog</button>
+          </div>
+          <label class="field field-wide">
+            <span>Project Catalog for Selected Client (one value per line)</span>
+            <textarea id="projectCatalog" rows="3">umf-prototype</textarea>
+          </label>
+          <div class="task-actions field-wide">
+            <button id="applyProjectCatalogBtn" type="button" class="mode-btn">Apply Project Catalog</button>
+          </div>
+          <label class="field field-wide">
+            <span>Sub-Part Catalog for Selected Client and Project (one value per line)</span>
+            <textarea id="systemCatalog" rows="3">core-planner</textarea>
+          </label>
+          <div class="task-actions field-wide">
+            <button id="applySystemCatalogBtn" type="button" class="mode-btn">Apply Sub-Part Catalog</button>
+          </div>
+          <label class="field field-wide">
+            <span>Prototype Template Catalog (one value per line)</span>
+            <textarea id="templateCatalog" rows="4">Capture internal reusable baseline
+Prepare client rollout prompt
+Frontend discovery and terms mapping</textarea>
+          </label>
+          <div class="task-actions field-wide">
+            <button id="applyTemplateCatalogBtn" type="button" class="mode-btn">Apply Prototype Template Catalog</button>
+          </div>
+          <label class="field field-wide">
+            <span>Task State Catalog (one value per line)</span>
+            <textarea id="stateCatalog" rows="3">todo
+planned
+done</textarea>
+          </label>
+          <div class="task-actions field-wide">
+            <button id="applyStateCatalogBtn" type="button" class="mode-btn">Apply Task State Catalog</button>
+          </div>
+          <label class="field field-wide">
+            <span>Task Template Catalog (format: title | state | priority)</span>
+            <textarea id="taskTemplateCatalog" rows="4">Capture internal baseline example | todo | high
+Map client constraints to prompt | planned | medium
+Review reusable rollout notes | done | low</textarea>
+          </label>
+          <div class="task-actions field-wide">
+            <button id="applyTaskTemplateCatalogBtn" type="button" class="mode-btn">Apply Task Template Catalog</button>
+          </div>
+        </div>
       </section>
 
       <section class="panel" aria-label="Domain shaping form">
@@ -38,21 +165,31 @@
           </label>
           <label class="field">
             <span>Client</span>
-            <input id="clientName" type="text" value="internal" />
+            <select id="clientName"></select>
           </label>
           <label class="field field-wide">
-            <span>Prototype Goal</span>
-            <input
-              id="prototypeGoal"
-              type="text"
-              value="Shape frontend interaction before deep scaffold expansion"
-            />
+            <span>Prototype Template</span>
+            <select id="prototypeGoal"></select>
           </label>
           <label class="field field-wide">
             <span>Notes</span>
             <textarea id="domainNotes" rows="3">Focus on minimal-first visual planning with explicit phase gates.</textarea>
           </label>
+          <label class="field">
+            <span>Project Name</span>
+            <select id="projectName"></select>
+          </label>
+          <label class="field">
+            <span>Sub-Part Name</span>
+            <select id="systemName"></select>
+          </label>
         </div>
+      </section>
+
+      <section class="panel" aria-label="Prompt structure preview">
+        <h2>Prompt Structure Preview</h2>
+        <p class="mode-summary">Generated from current domain, client, project, and system values.</p>
+        <pre id="promptStructurePreview" class="packet scaffold-preview"></pre>
       </section>
 
       <section class="panel split">
@@ -99,17 +236,67 @@
           <strong>Schema compatibility:</strong> v2 native export format. v1 draft imports are accepted and normalized.
         </div>
         <p id="draftStatus" class="draft-status" role="status" aria-live="polite"></p>
+        <label class="field field-wide" for="taskTemplateSelect">
+          <span>Task Template to Add</span>
+          <select id="taskTemplateSelect"></select>
+        </label>
         <div id="stateFilter" class="state-filter" role="group" aria-label="Task state filter">
-          <button type="button" class="chip active" data-filter="todo">todo</button>
-          <button type="button" class="chip" data-filter="planned">planned</button>
-          <button type="button" class="chip" data-filter="done">done</button>
         </div>
         <div id="taskBoard" class="task-board"></div>
       </section>
 
+      <section class="panel" aria-label="Project status explorer">
+        <h2>Project Status Explorer</h2>
+        <p class="mode-summary">Filter project status by client, project, and task state. Copilot status updates are tracked in JSON.</p>
+        <div class="form-grid">
+          <label class="field">
+            <span>Status Client Filter</span>
+            <select id="statusClientFilter"></select>
+          </label>
+          <label class="field">
+            <span>Status Project Filter</span>
+            <select id="statusProjectFilter"></select>
+          </label>
+          <label class="field">
+            <span>Status State Filter</span>
+            <select id="statusStateFilter"></select>
+          </label>
+          <div class="task-actions field-wide">
+            <button id="refreshStatusBtn" type="button" class="mode-btn">Refresh Status View</button>
+            <button id="copilotUpdateStatusBtn" type="button" class="mode-btn">Copilot Update Project Status</button>
+          </div>
+        </div>
+        <div id="projectStatusSummary" class="status-summary"></div>
+        <div id="projectStatusView" class="status-board"></div>
+        <details class="details-panel">
+          <summary>Technical JSON view</summary>
+          <pre id="projectStatusJson" class="packet"></pre>
+        </details>
+      </section>
+
+      <section class="panel" aria-label="Project bundle manager">
+        <h2>Project Bundle Manager</h2>
+        <p class="mode-summary">Export a full project bundle from Foundry and merge it back later when the client returns with new scope.</p>
+        <div class="task-actions">
+          <button id="exportProjectBundleBtn" type="button" class="mode-btn">Export Project Bundle</button>
+          <button id="importProjectBundleBtn" type="button" class="ghost-btn">Import Project Bundle</button>
+          <input id="importProjectBundleInput" type="file" accept="application/json" hidden />
+        </div>
+      </section>
+
       <section class="panel">
-        <h2>Generated Plan Packet Preview</h2>
-        <pre id="packet" class="packet"></pre>
+        <h2>Generated Prompt Packet Preview</h2>
+        <div id="promptPacketSummary" class="status-board"></div>
+        <details class="details-panel">
+          <summary>Technical JSON view</summary>
+          <pre id="packet" class="packet"></pre>
+        </details>
+      </section>
+
+      <section class="panel" aria-label="Copilot handoff readiness">
+        <h2>Ready for Copilot Handoff</h2>
+        <p class="mode-summary">Use this gate to confirm the prompt packet is complete before execution.</p>
+        <ul id="copilotReadiness" class="checklist readiness-list"></ul>
       </section>
     </main>
 

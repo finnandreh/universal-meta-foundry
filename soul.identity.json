@@ -1,0 +1,36 @@
+{
+  "manifest_version": 1,
+  "id": "umf-master-soul",
+  "name": "Universal Meta-Foundry Master Soul",
+  "project_role": "master_foundry",
+  "project_type": "meta_foundry",
+  "development_mode": true,
+  "master_file": "universal_meta_foundry_v3.md",
+  "identity_contract": {
+    "purpose": "Defines how this project identifies itself and how derived projects must define their own Soul identity.",
+    "master_is_authoritative": true,
+    "keep_master_file_during_development": true
+  },
+  "runtime_guidance": {
+    "copilot_instructions_scope": "local_project_only",
+    "generated_projects_must_define_own_scope": true
+  },
+  "derived_project_requirements": {
+    "required_identity_file": "soul.identity.json",
+    "required_fields": [
+      "id",
+      "name",
+      "project_role",
+      "project_type",
+      "purpose",
+      "operating_model",
+      "instruction_scope"
+    ],
+    "required_behavior": [
+      "do_not_reuse_master_identity_verbatim",
+      "define_project_specific_operating_rules",
+      "define_project_specific_copilot_scope"
+    ]
+  },
+  "created_at": "2026-03-12"
+}

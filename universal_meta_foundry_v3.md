@@ -2087,3 +2087,793 @@ Verification completed:
   * HTTP `200` from `/`
   * response contains `schemaInfoBtn`
   * response contains `Schema compatibility:`
+
+### 26.23 Scaffold Output Preview (Prototype Step)
+
+Date: 2026-03-12
+
+Frontend prototype expansion completed:
+
+* added scaffold naming fields: `Project Name` and `System Name`
+* added live `Scaffold Output Preview` panel showing generated folder hierarchy
+* scaffold preview is derived from domain/client/project/system context
+* packet preview now includes `scaffold_target` and `scaffold_preview`
+
+Files updated for this step:
+
+* `web/index.html`
+* `web/styles.css`
+* `web/app.js`
+* `tests/test_main.py`
+
+Verification completed:
+
+* automated tests: `2 passed` (`pytest -q`)
+* live check on `127.0.0.1:8001`:
+  * HTTP `200` from `/`
+  * response contains `Scaffold Output Preview`
+  * response contains `Project Name`
+
+### 26.24 Scaffold Planning Execution Blueprint
+
+Date: 2026-03-12
+
+This section defines exactly how scaffold output planning is intended to run before hardening.
+
+#### Step A: Prototype Input Capture
+
+Capture minimum scaffold-defining inputs in frontend:
+
+* `Domain Name`
+* `Client`
+* `Project Name`
+* `System Name`
+* current task model and state filter
+
+Expected artifact:
+
+* editable draft model in UI with local persistence and JSON import/export
+
+#### Step B: Scaffold Shape Preview
+
+Generate a live folder-tree preview from the captured inputs.
+
+Expected artifact:
+
+* `Scaffold Output Preview` panel showing workspace/domain/client/project/system hierarchy
+
+#### Step C: Packet Alignment
+
+Ensure the generation packet carries scaffold planning context, not only task context.
+
+Required packet fields:
+
+* `scaffold_target`
+* `scaffold_preview`
+* domain/client/project/system + task state context used to derive those values
+
+#### Step D: Human Review Gate (Before Hardening)
+
+Do not start hardening until scaffold shape is explicitly reviewed.
+
+Review checklist:
+
+* naming is stable enough for folders
+* client/domain/project/system boundaries are clear
+* task state policy aligns with selected filter behavior
+* scaffold preview matches expected output structure
+
+#### Step E: Transition to Growth/Hardening
+
+Only after Step D passes:
+
+* lock naming conventions
+* promote scaffold preview into generated scaffold files/folders
+* add validation and diagnostics depth on top of the accepted structure
+
+Current implementation status:
+
+* Step A: completed
+* Step B: completed
+* Step C: completed
+* Step D: manual review required per iteration
+* Step E: next phase after review sign-off
+
+### 26.25 Pre-Scaffold Baseline (Created)
+
+Date: 2026-03-12
+
+To reduce repeated setup work, a stable subset of the scaffold tree is now pre-created in the repository.
+
+Pre-created roots:
+
+* `clients/internal/`
+* `domains/_template/`
+* `shared/`
+* `foundry/`
+
+Pre-created internal client folders:
+
+* `clients/internal/domains/`
+* `clients/internal/models/`
+* `clients/internal/reusable_parts/`
+* `clients/internal/prototypes/`
+* `clients/internal/systems/`
+
+Pre-created domain-template output path (domain/client/project/system order):
+
+* `domains/_template/clients/internal/projects/_template/systems/_template/outputs/`
+* `domains/_template/clients/internal/projects/_template/systems/_template/docs/`
+
+Pre-created shared/foundry folders:
+
+* `shared/models/`
+* `shared/templates/`
+* `shared/reusable_modules/`
+* `shared/interface_patterns/`
+* `shared/scaffolds/`
+* `foundry/philosophy/`
+* `foundry/metaskill/`
+* `foundry/metaframework/`
+* `foundry/metascaffold/`
+* `foundry/generators/`
+
+Persistence note:
+
+* `.gitkeep` files are present in pre-scaffold leaf folders so the structure is versioned before full artifact generation.
+
+### 26.26 Prompt-Only GUI Policy (Current)
+
+Date: 2026-03-12
+
+Clarification applied:
+
+* the GUI is a prompt drafting surface, not an immediate code generation executor
+* Copilot execution is intentionally deferred to a later cycle after prompt review
+* current packet outputs should be treated as prompt context artifacts for later activation
+
+Frontend naming and packet alignment now emphasize prompt intent:
+
+* preview panel label: `Prompt Structure Preview`
+* packet panel label: `Generated Prompt Packet Preview`
+* packet fields: `prompt_target`, `prompt_outline`
+* execution markers: `execution_policy=prompt_only`, `copilot_execution=deferred`
+
+Operating rule:
+
+* use the GUI to capture and refine domain/client/project/system context and task-state context
+* review prompt packet quality first
+* start Copilot generation only after explicit human go-ahead
+
+### 26.27 Copilot Handoff Readiness Gate (Added)
+
+Date: 2026-03-12
+
+A visible handoff gate is now included in the frontend so prompt drafting and execution remain clearly separated.
+
+Added GUI panel:
+
+* `Ready for Copilot Handoff`
+* checklist validates prompt readiness before execution handoff
+
+Added packet field:
+
+* `copilot_handoff`
+  * `ready` (boolean)
+  * `checklist` (id/label/pass entries)
+
+Checklist intent:
+
+* confirm domain/client/project/system context is complete
+* confirm prompt goal is defined
+* confirm at least one `todo` task is present for future execution
+* confirm task titles are non-empty
+* preserve deferred execution policy
+
+### 26.28 JSON-Backed Setup Catalog and Internal-First Reuse
+
+Date: 2026-03-12
+
+Scope clarification applied:
+
+* the GUI remains an easy visual editor for project facts
+* source of truth is the JSON draft payload
+* setup values are configurable and persisted in JSON so the UI stays flexible
+
+Added setup mechanism:
+
+* `Setup Catalog` panel now manages:
+  * client names catalog
+  * prototype template catalog
+* both catalogs are stored in `setup.clients` and `setup.templates`
+* Domain Draft now uses dropdowns for:
+  * `Client`
+  * `Prototype Template`
+
+Internal-first reuse policy in packet:
+
+* packet includes `reuse_strategy` with mode `internal_first_examples`
+* intent is to capture first-time techniques (example: MQTT broker licensing baseline) in internal context first
+* later client prompts can reuse previously captured internal examples to improve consistency and speed
+
+Operational benefit:
+
+* if a technique was solved once internally, the same structure can be reused across end clients
+* this improves repeatability, reduces reinvention, and keeps client systems aligned
+
+### 26.29 Hierarchical Setup Flow and Task Catalog Flexibility
+
+Date: 2026-03-12
+
+Extended setup flexibility has been added so the page can be configured in a strict top-down order while still using JSON as source of truth.
+
+Ordered setup flow now supported:
+
+1. client catalog
+2. project catalog for selected client
+3. sub-part catalog for selected client and project
+4. prototype template catalog
+5. task state catalog
+6. task template catalog
+
+GUI behavior updates:
+
+* each setup block has its own apply button
+* Domain Draft selectors are now dropdown-based for:
+  * client
+  * project
+  * sub-part
+  * prototype template
+* task board now adds tasks from a `Task Template to Add` dropdown
+* task states are no longer fixed; they are driven by setup catalog values
+
+JSON model extension:
+
+* `setup.projects_by_client`
+* `setup.systems_by_client_project`
+* `setup.task_states`
+* `setup.task_templates`
+
+Internal reuse continuity:
+
+* reusable internal examples can continue to grow over time in setup catalogs
+* as more production-ready patterns are captured, dropdowns become richer without code changes
+* this preserves consistency when moving from internal patterns to client-specific prompt packets
+
+### 26.30 Project Status Explorer and Project Bundle Roundtrip
+
+Date: 2026-03-12
+
+Added project lifecycle controls focused on long-running client continuity.
+
+Project Status Explorer:
+
+* filter by client, project, and task state
+* view project status rows and state counts in a JSON view panel
+* explicit action: `Copilot Update Project Status`
+* status updates are tracked in setup JSON (`setup.project_status_by_key`)
+
+Copilot status governance:
+
+* prompt packet now includes status tracking data
+* packet marks that Copilot status updates are required as part of handoff flow
+
+Project bundle roundtrip support:
+
+* `Export Project Bundle` creates a portable JSON package for selected domain/client/project/sub-part
+* bundle includes project identity, domain slice, setup subset, tasks, and status metadata
+* `Import Project Bundle` merges returning client work into the main Foundry JSON model
+
+Merge behavior for returning clients:
+
+* merges client/project/sub-part catalogs without losing existing entries
+* merges task states, task templates, and tasks using deduplicated merge logic
+* restores or creates project status tracking entry
+* rehydrates current dropdown selections to imported project context
+
+Outcome:
+
+* projects can safely leave Foundry, evolve externally, and return with minimal friction
+* Foundry remains the central continuity model while supporting client lifecycle growth
+
+### 26.31 Human-Readable Output Standard
+
+Date: 2026-03-12
+
+Added presentation policy for all Foundry-developed project UIs:
+
+* parsed outputs must be shown in human-readable form by default
+* raw JSON remains available as optional technical detail, not the primary view
+
+Applied in current prototype:
+
+* Project Status Explorer now renders readable project cards and a plain-language summary line
+* Prompt Packet Preview now renders readable summary cards for context, gate, tasks, and handoff readiness
+* `Technical JSON view` is retained in expandable details for advanced/debug usage
+
+Design rule moving forward:
+
+* regular users should understand status, recommendations, and next actions without reading JSON
+* technical JSON is secondary and supports auditing, debugging, and automation
+
+### 26.32 Global View Mode Toggle
+
+Date: 2026-03-12
+
+Added a global View Mode selector so all Foundry GUIs can consistently switch presentation style.
+
+Modes:
+
+* User View: human-readable summaries are primary; technical JSON panels are hidden
+* Technical View: raw JSON detail panels are shown for debugging, auditing, and advanced operations
+
+Model behavior:
+
+* selected mode is persisted in draft JSON (`view_mode`)
+* mode is restored on load/import so teams keep consistent presentation context
+
+Foundry UX rule:
+
+* build all future Foundry project GUIs with this same two-mode presentation contract
+* user-facing default should remain User View unless technical work is explicitly needed
+
+### 26.33 Foundry Evolution Engine (Living System Policy)
+
+Date: 2026-03-12
+
+To give the Foundry "life" over time, add a persistent evolution loop that learns from usage and proposes safe improvements to GUI structure, setup catalogs, and prompt packet JSON.
+
+Purpose:
+
+* keep the system adaptable as client needs grow
+* turn repeated manual edits into reusable patterns
+* suggest high-value improvements without breaking stability
+
+Core behavior:
+
+1. Observe
+  * capture recurring user actions and repeated manual work
+  * detect frequent custom fields added for specific clients/projects
+  * track where handoff readiness repeatedly fails
+
+2. Learn
+  * convert repeated patterns into candidate "Foundry enhancements"
+  * classify candidates as:
+    * GUI enhancement
+    * JSON schema extension
+    * setup catalog improvement
+    * workflow/governance rule update
+
+3. Propose
+  * emit a human-readable "Suggested Modification" card in the GUI
+  * include:
+    * what problem is being solved
+    * impacted GUI fields/panels
+    * impacted JSON keys
+    * migration/compatibility impact
+    * confidence level
+
+4. Gate
+  * no automatic structural change without approval
+  * require explicit user decision:
+    * accept now
+    * defer
+    * reject
+  * require schema version bump when JSON structure changes
+
+5. Record
+  * store accepted changes as evolution entries so future projects inherit improvements
+  * preserve rejected/deferred proposals to avoid noisy repetition
+
+Minimum JSON additions:
+
+* `evolution.enabled` (boolean)
+* `evolution.suggestions[]` (pending suggestions with rationale)
+* `evolution.accepted[]` (approved upgrades with date/version)
+* `evolution.rejected[]` (rejected upgrades with reason)
+* `evolution.last_reviewed_at` (timestamp)
+
+Suggested suggestion object shape:
+
+```json
+{
+  "id": "sugg_20260312_001",
+  "type": "json_schema_extension",
+  "title": "Add client compliance profile",
+  "reason": "Field manually added in 5 projects",
+  "impact": {
+    "gui": ["Domain Draft"],
+    "json_keys": ["domain.compliance_profile"],
+    "schema_version_change": true
+  },
+  "status": "pending",
+  "confidence": "high"
+}
+```
+
+GUI requirements for living evolution:
+
+* add an `Evolution Inbox` panel for pending suggestions
+* show impact badges: `GUI`, `JSON`, `Workflow`, `Low Risk`, `Needs Migration`
+* one-click actions: `Accept`, `Defer`, `Reject`
+* include a short plain-language summary for non-technical users
+
+Safety and governance:
+
+* accepted JSON-structure changes require:
+  * schema version increment
+  * backward import compatibility path
+  * migration note in this master document
+* changes affecting generation behavior require:
+  * updated handoff checklist criteria
+  * explicit note in Copilot instructions/prompt packet rules
+
+Operating cycle:
+
+```text
+Observe Usage
+→ Detect Pattern
+→ Build Suggestion
+→ Human Review
+→ Accept/Defer/Reject
+→ Apply + Version + Document
+→ Re-evaluate on future usage
+```
+
+Foundry rule going forward:
+
+* every significant recurring manual pattern should become either:
+  * a reusable setup catalog option,
+  * a new optional GUI field,
+  * or a governed prompt packet/schema extension.
+* this keeps the Foundry continuously improving while preserving architectural control.
+
+### 26.34 Lightweight Soul Brain for Derived Foundries
+
+Date: 2026-03-12
+
+When this Foundry creates another Foundry type (for example a plugin-focused Foundry), it should carry a lightweight, inheritable "Soul Brain" profile by default.
+
+Goal:
+
+* keep derived Foundries aligned with core principles
+* keep adaptation logic lightweight and portable
+* allow smart improvement suggestions without forcing heavy complexity
+
+Lightweight-by-default rule:
+
+* every derived Foundry starts with a minimal brain profile
+* profile is metadata-first, not a heavy runtime subsystem
+* only expand the brain profile when repeated usage proves value
+
+Minimum Soul Brain profile fields:
+
+* `soul.enabled` (boolean)
+* `soul.profile` (for example: `light` | `standard` | `extended`)
+* `soul.principles_anchor` (reference to core Foundry principles)
+* `soul.recommendation_mode` (`suggest_only` default)
+* `soul.inheritance_source` (parent Foundry id/version)
+
+Derived Foundry inheritance rule:
+
+* child Foundries inherit the parent Soul Brain principles anchor
+* child Foundries may add domain-specific suggestion rules
+* child Foundries must keep compatibility with parent governance gates
+
+Copilot decision policy for Soul Brain suggestions:
+
+* Copilot may decide when a suggestion is beneficial
+* Copilot should emit recommendation rationale including:
+  * expected benefit
+  * impact scope
+  * risk level
+  * rollback simplicity
+* Copilot should not directly apply structural/schema changes in `suggest_only` mode
+* human approval remains required for accepted structural change
+
+Plugin Foundry adaptation rule:
+
+* for plugin-oriented Foundries, prioritize suggestions that improve:
+  * extension points
+  * plugin metadata consistency
+  * compatibility checks
+  * upgrade/migration safety
+* avoid introducing heavy orchestration unless plugin complexity actually requires it
+
+Escalation model:
+
+* `light` profile:
+  * passive observation
+  * low-noise suggestions
+  * no auto-application
+* `standard` profile:
+  * richer pattern detection
+  * grouped suggestion packs
+  * guided migration plans
+* `extended` profile:
+  * cross-project pattern synthesis
+  * broader optimization recommendations
+  * still governed by approval gates for structure changes
+
+Foundry continuity rule:
+
+* every new Foundry generated by this system should include a Soul Brain profile file or JSON block from day one
+* this ensures each future Foundry has a consistent "always-follow" intelligence baseline while staying intentionally lightweight at startup.
+
+### 26.35 Soul Brain Smart Capability Catalog
+
+Date: 2026-03-12
+
+To strengthen the Soul Brain system, define a capability catalog that can be enabled progressively by profile level.
+
+Purpose:
+
+* keep intelligence practical and modular
+* avoid overloading early-stage Foundries
+* make upgrades predictable and governed
+
+Capability list:
+
+1. Pattern Miner
+  * detects repeated manual edits and recurring custom fields
+  * proposes reusable catalog entries, optional GUI fields, or schema extensions
+
+2. Drift Guard
+  * checks alignment with core structure and principles
+  * warns when domain/client/project/system context quality degrades
+
+3. Reuse Recommender
+  * suggests existing internal assets before creating new ones
+  * prioritizes proven internal patterns for consistency and speed
+
+4. Gate Predictor
+  * estimates handoff readiness risk before formal review
+  * highlights likely checklist failures early
+
+5. Risk Radar
+  * scores proposed changes by architecture impact, migration cost, and rollback complexity
+  * surfaces risk tier as `low`, `medium`, or `high`
+
+6. Schema Guardian
+  * validates compatibility impact of new fields
+  * proposes version and import-normalization requirements
+
+7. Prompt Quality Critic
+  * evaluates prompt packet clarity, completeness, and ambiguity
+  * proposes concise improvements before handoff
+
+8. Evolution Conflict Resolver
+  * detects collisions between multiple accepted/pending suggestions
+  * proposes option paths with tradeoff summaries
+
+9. Plugin Fitness Advisor
+  * for plugin Foundries, evaluates extension-point quality and compatibility stability
+  * recommends metadata and migration hardening steps
+
+10. Explainability Narrator
+  * produces plain-language explanations for why each suggestion exists
+  * keeps decision context understandable for non-technical users
+
+11. Learning Budget Controller
+  * limits number of suggestions per cycle to reduce noise
+  * protects focus and trust in recommendation quality
+
+12. Inheritance Auditor
+  * verifies that child Foundries still honor parent principles and governance gates
+  * reports divergence and remediation options
+
+Profile mapping:
+
+* `light` profile defaults:
+  * Pattern Miner
+  * Drift Guard
+  * Learning Budget Controller
+  * Explainability Narrator (summary mode)
+
+* `standard` profile defaults:
+  * all `light` capabilities
+  * Reuse Recommender
+  * Gate Predictor
+  * Risk Radar
+  * Prompt Quality Critic
+  * Schema Guardian
+
+* `extended` profile defaults:
+  * all `standard` capabilities
+  * Evolution Conflict Resolver
+  * Plugin Fitness Advisor (when plugin mode is active)
+  * Inheritance Auditor
+
+Governance constraints:
+
+* all capabilities operate under `suggest_only` unless explicitly overridden by policy
+* structural/schema modifications still require approval gates
+* high-risk recommendations require explicit risk note and rollback note in decision logs
+
+JSON extension guidance (optional fields):
+
+* `soul.capabilities.enabled[]`
+* `soul.capabilities.disabled[]`
+* `soul.learning_budget.max_suggestions_per_cycle`
+* `soul.risk_threshold.auto_block_level`
+* `soul.audit.last_inheritance_check`
+
+Operational rollout rule:
+
+1. start with `light` profile for new Foundries
+2. promote to `standard` only after recurring complexity is observed
+3. promote to `extended` only when cross-project scale or plugin complexity justifies it
+4. record every profile change in this document and in Foundry JSON metadata
+
+Outcome target:
+
+* the Soul Brain remains useful, explainable, and lightweight at startup
+* intelligence depth increases only when proven necessary
+* every derived Foundry gets a consistent smart baseline without losing governance control
+
+### 26.36 Soul Brain GUI and JSON Integration (Implemented)
+
+Date: 2026-03-12
+
+Implemented a first practical Soul Brain control surface in the prototype GUI and wired it into draft persistence, export/import, and packet preview.
+
+GUI additions:
+
+* new `Soul Brain` panel in the frontend
+* controls for:
+  * enabled/disabled state
+  * profile (`light`, `standard`, `extended`)
+  * recommendation mode (`suggest_only`, `guided_apply`)
+  * learning budget (`max_suggestions_per_cycle`)
+  * principles anchor
+  * inheritance source
+  * enabled capabilities list
+  * disabled capabilities list
+
+JSON model integration:
+
+* draft payload now carries a `soul` object
+* `soul` is included in:
+  * local draft persistence
+  * JSON export/import roundtrip
+  * project bundle export/import roundtrip
+  * prompt packet preview payload
+
+Compatibility behavior:
+
+* older draft files without `soul` data are still accepted
+* missing Soul fields are normalized to safe defaults
+* governance behavior remains recommendation-first by default
+
+Verification status:
+
+* frontend route test assertions now include Soul Brain UI markers
+* health endpoint test remains unchanged
+
+Operational note:
+
+* this implementation establishes the Soul Brain as a configurable metadata layer
+* capability execution remains policy-governed and should stay lightweight unless profile escalation is explicitly approved
+
+### 26.37 Evolution Inbox and Preset-Driven Soul Behavior (Implemented)
+
+Date: 2026-03-12
+
+Implemented the next Soul Brain phase in the frontend with three practical additions:
+
+1. Evolution Inbox panel
+
+* new `Evolution Inbox` UI section shows pending recommendation cards
+* each recommendation provides:
+  * title
+  * reason
+  * type
+  * risk
+  * status
+* decision actions added:
+  * `Accept`
+  * `Defer`
+  * `Reject`
+
+2. Soul profile presets
+
+* profile selection now applies preset behavior automatically:
+  * `light`
+  * `standard`
+  * `extended`
+* presets update:
+  * recommendation mode
+  * learning budget
+  * enabled/disabled capability lists
+* this keeps Soul configuration consistent and avoids manual drift
+
+3. First live suggestion detector
+
+* detector runs in the frontend recommendation loop and creates low-risk suggestions from current project state
+* current rule examples include:
+  * recommend expanding task states when only minimal states exist
+  * recommend expanding task templates when task activity is high
+  * recommend prompt-clarity review task when notes are long
+  * recommend reuse review task when multi-client context is active
+
+Behavior and persistence:
+
+* evolution suggestions are persisted in draft JSON under Soul metadata
+* suggestion history and last scan timestamp are tracked
+* accepted suggestions can apply lightweight auto-actions in the prototype (for example adding states/templates/tasks)
+* suggestion output remains recommendation-governed and compatible with existing approval policy
+
+Prompt packet integration:
+
+* packet now includes Soul active capability data and Evolution Inbox summary counts
+* human-readable summary card includes pending suggestion count
+
+Verification status:
+
+* frontend route test updated with `Evolution Inbox` marker
+* existing test suite remains passing
+
+### 26.38 Soul Identity Manifest Contract (Master + Generated Projects)
+
+Date: 2026-03-12
+
+To ensure each generated project can identify itself correctly (instead of inheriting master instructions blindly), a Soul Identity Manifest contract is now established.
+
+Added repository files:
+
+* `soul.identity.json` (master project identity file)
+* `shared/templates/soul.identity.template.json` (template for newly generated projects)
+
+Master identity rule:
+
+* the master project keeps its own identity file and remains in development mode
+* the master reference document (`universal_meta_foundry_v3.md`) remains authoritative while developing the Foundry itself
+* master Copilot instruction scope is local to the master system and must not be assumed universal for all generated outputs
+
+Generated project identity rule:
+
+* every newly generated project must include its own `soul.identity.json`
+* generated projects must define:
+  * project purpose
+  * project role/type
+  * operating model
+  * instruction scope and inheritance source
+  * in-scope vs out-of-scope boundaries
+* generated projects should not copy master identity verbatim
+
+Packet integration update:
+
+* prompt packet metadata now includes `soul_identity_manifest` with:
+  * `master_identity_file`
+  * `generated_identity_template`
+  * `required_for_generated_projects`
+  * `instruction_scope_rule`
+
+Operational outcome:
+
+* the Soul system now has a concrete file-level identity contract
+* each child project can operate with project-specific guidance
+* the master Foundry can continue evolving without losing its own authoritative context
+
+### 26.39 Handoff Guard for Generated Soul Identity Planning
+
+Date: 2026-03-12
+
+Added a Copilot handoff readiness guard so identity requirements are enforced before execution handoff.
+
+Guard behavior:
+
+* if the Soul identity manifest marks generated project identity as required, handoff readiness now checks that a generated identity file plan exists
+* readiness checklist includes:
+  * `Generated project soul identity file is planned when required`
+
+Model alignment:
+
+* Soul configuration now carries identity-manifest metadata fields used by both:
+  * prompt packet metadata
+  * handoff readiness validation
+
+Outcome:
+
+* generated projects cannot be treated as identity-context-free at handoff time
+* identity scope requirements are checked in the same readiness gate used for prompt quality and task governance

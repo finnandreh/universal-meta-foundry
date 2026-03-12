@@ -1,0 +1,26 @@
+{
+  "manifest_version": 1,
+  "id": "project-soul-id",
+  "name": "Project Soul Name",
+  "project_role": "generated_foundry_or_project",
+  "project_type": "domain_foundry_or_plugin_foundry_or_solution",
+  "purpose": "What this generated project is and why it exists.",
+  "operating_model": {
+    "mode": "prompt_first_or_execution_first",
+    "governance": "human_approval_required_for_structural_changes"
+  },
+  "instruction_scope": {
+    "copilot_instructions_apply_to": "this_project_only",
+    "inherits_from_parent": true,
+    "inheritance_source": "parent-soul-id"
+  },
+  "project_boundaries": {
+    "in_scope": [
+      "list key responsibilities"
+    ],
+    "out_of_scope": [
+      "list exclusions"
+    ]
+  },
+  "identity_notes": "Customize this file per generated project. Do not copy master identity unchanged."
+}

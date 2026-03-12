@@ -151,7 +151,8 @@ h1 {
 }
 
 .field input,
-.field textarea {
+.field textarea,
+.field select {
   border: 1px solid rgba(169, 199, 213, 0.28);
   border-radius: 10px;
   background: rgba(6, 16, 24, 0.56);
@@ -161,7 +162,8 @@ h1 {
 }
 
 .field input:focus,
-.field textarea:focus {
+.field textarea:focus,
+.field select:focus {
   outline: none;
   border-color: rgba(73, 182, 214, 0.84);
   box-shadow: 0 0 0 2px rgba(73, 182, 214, 0.2);
@@ -335,6 +337,85 @@ h1 {
   color: var(--ink-soft);
 }
 
+
+.readiness-list {
+  margin-top: 0.65rem;
+}
+
+.status-summary {
+  margin: 0.65rem 0;
+  color: var(--ink-soft);
+  font-size: 0.9rem;
+}
+
+.status-board {
+  display: grid;
+  gap: 0.6rem;
+  margin-top: 0.5rem;
+}
+
+.status-card {
+  border: 1px solid rgba(169, 199, 213, 0.25);
+  border-radius: 12px;
+  background: rgba(6, 16, 24, 0.5);
+  padding: 0.65rem 0.75rem;
+}
+
+.status-card h3 {
+  margin: 0 0 0.3rem;
+  font-size: 0.95rem;
+  color: #d9f5ff;
+}
+
+.status-card p {
+  margin: 0.2rem 0;
+  color: var(--ink-soft);
+  font-size: 0.88rem;
+}
+
+.evolution-card {
+  border: 1px solid rgba(73, 182, 214, 0.35);
+}
+
+.evolution-meta {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  margin-top: 0.25rem;
+}
+
+.evolution-tag {
+  border: 1px solid rgba(169, 199, 213, 0.38);
+  border-radius: 999px;
+  padding: 0.08rem 0.42rem;
+  font-size: 0.72rem;
+  color: var(--ink-soft);
+  background: rgba(6, 16, 24, 0.55);
+}
+
+.evolution-actions {
+  display: flex;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+  margin-top: 0.5rem;
+}
+
+.evolution-actions .mode-btn,
+.evolution-actions .ghost-btn {
+  padding: 0.3rem 0.7rem;
+}
+
+.details-panel {
+  margin-top: 0.7rem;
+}
+
+.details-panel summary {
+  cursor: pointer;
+  color: var(--ink-soft);
+  font-size: 0.86rem;
+  margin-bottom: 0.4rem;
+}
+
 .packet {
   margin: 0;
   max-height: 280px;
@@ -344,6 +425,11 @@ h1 {
   background: rgba(6, 16, 24, 0.66);
   border: 1px solid rgba(169, 199, 213, 0.15);
   color: #c8effa;
+}
+
+.scaffold-preview {
+  max-height: 360px;
+  white-space: pre;
 }
 
 @keyframes drift {
