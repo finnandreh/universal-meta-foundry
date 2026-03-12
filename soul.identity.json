@@ -1,35 +1,50 @@
 {
   "manifest_version": 1,
-  "id": "umf-master-soul",
-  "name": "Universal Meta-Foundry Master Soul",
-  "project_role": "master_foundry",
-  "project_type": "meta_foundry",
-  "development_mode": true,
-  "master_file": "universal_meta_foundry_v3.md",
-  "identity_contract": {
-    "purpose": "Defines how this project identifies itself and how derived projects must define their own Soul identity.",
-    "master_is_authoritative": true,
-    "keep_master_file_during_development": true
-  },
-  "runtime_guidance": {
-    "copilot_instructions_scope": "local_project_only",
-    "generated_projects_must_define_own_scope": true
-  },
-  "derived_project_requirements": {
-    "required_identity_file": "soul.identity.json",
-    "required_fields": [
-      "id",
-      "name",
-      "project_role",
-      "project_type",
-      "purpose",
-      "operating_model",
-      "instruction_scope"
+  "id": "quick-kitchen-inventory-soul",
+  "name": "Quick Kitchen Inventory",
+  "project_role": "ready_system",
+  "project_type": "web_tracker",
+  "purpose": "Track pantry and fridge items with simple add/use/low-stock status so shopping decisions are fast.",
+  "operating_model": {
+    "mode": "single_user_local_first",
+    "workflow": [
+      "add_item",
+      "update_quantity",
+      "mark_low_stock",
+      "review_shopping_list"
     ],
-    "required_behavior": [
-      "do_not_reuse_master_identity_verbatim",
-      "define_project_specific_operating_rules",
-      "define_project_specific_copilot_scope"
+    "primary_entities": [
+      "item",
+      "category",
+      "shopping_flag"
+    ]
+  },
+  "instruction_scope": {
+    "copilot_scope": "this_project_only",
+    "in_scope": [
+      "frontend_form_and_list_ui",
+      "simple_crud_api",
+      "local_json_export_import",
+      "basic_low_stock_rules"
+    ],
+    "out_of_scope": [
+      "multi_tenant_auth",
+      "payment_flows",
+      "cloud_infrastructure_automation"
+    ]
+  },
+  "starter_defaults": {
+    "categories": [
+      "Pantry",
+      "Fridge",
+      "Freezer",
+      "Spices"
+    ],
+    "low_stock_threshold": 2,
+    "status_values": [
+      "ok",
+      "low",
+      "out"
     ]
   },
   "created_at": "2026-03-12"

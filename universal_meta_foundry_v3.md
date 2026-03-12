@@ -2966,3 +2966,96 @@ Outcome:
 
 * Foundry can represent both delivery classes in a governed way
 * prompt and execution intent are clearer for both client-facing systems and meta-system builder projects
+
+### 26.42 Starter-Ready GUI Baseline Reset (Implemented)
+
+Date: 2026-03-12
+
+Applied a startup baseline reset so first load begins from a cleaner, test-friendly state with minimal prefilled planning data.
+
+Frontend default updates:
+
+* setup catalogs now start from a starter baseline:
+  * client: `internal`
+  * project: `starter-project`
+  * sub-part: `starter-system`
+* prototype template catalog now defaults to a single lightweight starter item
+* task template catalog now defaults to empty
+* default task model now starts empty
+* domain defaults are simplified:
+  * domain name: `New Foundry Project`
+  * notes: empty
+
+Recommendation noise control update:
+
+* startup drift/evolution recommendation checks now require some actual task activity before suggesting task-template expansion
+* this reduces false-positive recommendations on a clean initial load
+
+Files updated:
+
+* `web/index.html`
+* `web/app.js`
+
+Verification completed:
+
+* automated tests: `2 passed` (`pytest -q`)
+
+### 26.43 Test Client Starter Visibility (Implemented)
+
+Date: 2026-03-12
+
+Updated GUI defaults so the simple ready-to-go starter system is visible under a dedicated `test` client.
+
+Default setup changes:
+
+* setup clients now include `internal` and `test`
+* default selected domain context now starts at:
+  * client: `test`
+  * project: `kitchen-inventory`
+  * sub-part: `core-tracker`
+* default domain name now starts as `Quick Kitchen Inventory`
+* default prototype template now starts as `Launch kitchen inventory starter`
+
+Integrity behavior update:
+
+* setup integrity fallback now preserves a practical starter mapping for `test` client contexts
+* this helps older/partial setups remain operable when catalogs are incomplete
+
+Files updated:
+
+* `web/app.js`
+* `web/index.html`
+
+### 26.44 Kitchen-Only Empty Start Baseline (Implemented)
+
+Date: 2026-03-12
+
+Adjusted the kitchen-only baseline to start from an empty planning state while retaining kitchen project context.
+
+Behavior:
+
+* `test` remains the only default client
+* `kitchen-inventory` and `core-tracker` remain the default project path
+* default task model starts empty
+* default task template catalog starts empty
+
+Outcome:
+
+* first-load experience is now a clean scratch pad for task planning without pre-seeded tasks
+
+### 26.45 Kitchen Baseline Single Visible Task (Implemented)
+
+Date: 2026-03-12
+
+Adjusted the kitchen-only baseline to include one visible starter task in the default task model.
+
+Default task now present on load:
+
+* title: `Create pantry baseline list`
+* state: `todo`
+* priority: `medium`
+
+Scope:
+
+* kitchen-only client/project/system defaults remain unchanged
+* this change affects initial task visibility only

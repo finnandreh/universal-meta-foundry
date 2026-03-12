@@ -186,34 +186,31 @@ function toggleSchemaInfo(forceOpen) {
 
 function getDefaultTaskModel() {
   return [
-    { title: "Capture internal baseline example", state: "todo", priority: "high" },
-    { title: "Map client constraints to prompt", state: "planned", priority: "medium" },
-    { title: "Review reusable rollout notes", state: "done", priority: "low" }
+    {
+      title: "Create pantry baseline list",
+      state: "todo",
+      priority: "medium"
+    }
   ];
 }
 
 function getDefaultSetupCatalog() {
   return {
-    clients: ["internal"],
+    clients: ["test"],
     templates: [
-      "Capture internal reusable baseline",
-      "Prepare client rollout prompt",
-      "Frontend discovery and terms mapping"
+      "Launch kitchen inventory starter"
     ],
     projects_by_client: {
-      internal: ["umf-prototype"]
+      internal: ["starter-project"],
+      test: ["kitchen-inventory"]
     },
     systems_by_client_project: {
-      "internal/umf-prototype": ["core-planner"]
+      "test/kitchen-inventory": ["core-tracker"]
     },
     task_states: ["todo", "planned", "done"],
-    task_templates: [
-      { title: "Capture internal baseline example", state: "todo", priority: "high" },
-      { title: "Map client constraints to prompt", state: "planned", priority: "medium" },
-      { title: "Review reusable rollout notes", state: "done", priority: "low" }
-    ],
+    task_templates: [],
     project_status_by_key: {
-      "internal/umf-prototype/core-planner": {
+      "test/kitchen-inventory/core-tracker": {
         status: "active",
         phase: "prototype_mode",
         updated_by: "system",
@@ -469,12 +466,12 @@ function renderStateFilterChips() {
 
 function ensureSetupIntegrity() {
   if (!setupCatalog.clients.includes(clientName.value)) {
-    setupCatalog.clients.push(clientName.value || "internal");
+    setupCatalog.clients.push(clientName.value || "test");
   }
 
   for (const client of setupCatalog.clients) {
     if (!Array.isArray(setupCatalog.projects_by_client[client]) || setupCatalog.projects_by_client[client].length === 0) {
-      setupCatalog.projects_by_client[client] = ["umf-prototype"];
+      setupCatalog.projects_by_client[client] = ["kitchen-inventory"];
     }
     for (const project of setupCatalog.projects_by_client[client]) {
       const key = makeClientProjectKey(client, project);
@@ -482,7 +479,10 @@ function ensureSetupIntegrity() {
         !Array.isArray(setupCatalog.systems_by_client_project[key]) ||
         setupCatalog.systems_by_client_project[key].length === 0
       ) {
-        setupCatalog.systems_by_client_project[key] = ["core-planner"];
+        setupCatalog.systems_by_client_project[key] =
+          client === "test" && project === "kitchen-inventory"
+            ? ["core-tracker"]
+            : ["core-tracker"];
       }
 
       for (const system of setupCatalog.systems_by_client_project[key]) {
@@ -507,18 +507,18 @@ function ensureSetupIntegrity() {
 function setDefaultDomainFields() {
   const defaultSetup = getDefaultSetupCatalog();
   const defaultSoul = getDefaultSoulConfig();
-  domainName.value = "Universal Meta-Foundry";
+  domainName.value = "Quick Kitchen Inventory";
   setupCatalog = JSON.parse(JSON.stringify(defaultSetup));
   soulConfig = JSON.parse(JSON.stringify(defaultSoul));
   syncSetupInputsFromCatalog();
   renderSetupDropdowns(
-    "internal",
-    "umf-prototype",
-    "core-planner",
-    "Capture internal reusable baseline"
+    "test",
+    "kitchen-inventory",
+    "core-tracker",
+    "Launch kitchen inventory starter"
   );
   deliveryType.value = "ready_system";
-  domainNotes.value = "Focus on minimal-first visual planning with explicit phase gates.";
+  domainNotes.value = "";
   syncSoulInputsFromConfig();
 }
 
@@ -609,7 +609,11 @@ function runEvolutionScan() {
     });
   }
 
-  if (hasCapability("drift_guard") && setupCatalog.task_states.length <= 3) {
+  if (
+    hasCapability("drift_guard") &&
+    setupCatalog.task_states.length <= 3 &&
+    taskModel.length >= 3
+  ) {
     suggestions.push({
       id: "sugg_extend_task_states",
       title: "Add richer task states",
@@ -846,14 +850,14 @@ function sanitizeDraft(payload) {
     name:
       domain && typeof domain.name === "string"
         ? domain.name
-        : "Universal Meta-Foundry",
-    client: domain && typeof domain.client === "string" ? domain.client : "internal",
+        : "Quick Kitchen Inventory",
+    client: domain && typeof domain.client === "string" ? domain.client : "test",
     goal:
       domain && typeof domain.goal === "string"
         ? domain.goal
         : domain && typeof domain.prototype_goal === "string"
           ? domain.prototype_goal
-        : "Capture internal reusable baseline",
+        : "Launch kitchen inventory starter",
     delivery_type:
       domain &&
       typeof domain.delivery_type === "string" &&
@@ -863,12 +867,11 @@ function sanitizeDraft(payload) {
     notes:
       domain && typeof domain.notes === "string"
         ? domain.notes
-        : "Focus on minimal-first visual planning with explicit phase gates.",
+        : "",
     project:
-      domain && typeof domain.project === "string" ? domain.project : "umf-prototype",
-    system: domain && typeof domain.system === "string" ? domain.system : "core-planner"
+      domain && typeof domain.project === "string" ? domain.project : "kitchen-inventory",
+    system: domain && typeof domain.system === "string" ? domain.system : "core-tracker"
   };
-
   const normalizedSetup = {
     clients: normalizeCatalog(setup && setup.clients, defaultSetup.clients),
     templates: normalizeCatalog(setup && setup.templates, defaultSetup.templates),
