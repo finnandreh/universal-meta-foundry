@@ -347,6 +347,31 @@ function getTaskStateCounts() {
 let realProjectRows = [];
 let realProjectListingLoaded = false;
 let realProjectListingFailed = false;
+let templateArchiveIndexInfo = null;
+let templateGovernanceMetadataAvailable = false;
+const PROMPT_SPEC_DOC = "gui_prompt_sections.md";
+
+const INTAKE_META_RECIPE =
+  "PhilosophyRecipeRequired: Apply Foundry meta stack (philosophy -> meta-skill -> meta-framework -> meta-scaffold -> governance) before implementation.";
+const INTAKE_ENVIRONMENT_QUESTIONS_REQUIRED =
+  "IntakeClarificationRequired: Ask environment/toolchain and board profile questions first (for example ESP-IDF vs PlatformIO) and add environment-decision todo if unresolved.";
+const META_PROMPT_TODO_REQUIREMENT =
+  "MetaPromptTodoRequired: Create high-priority todo to define meta-philosophy, meta-skill, meta-framework, and meta-scaffold for this project.";
+const META_PROMPT_TODO_REFORM_REQUIREMENT =
+  "MetaPromptTodoReformRequired: If project is not started, explicitly reform/refresh the meta prompt todo before other todo updates.";
+const META_PROMPT_DELTA_REQUIREMENT =
+  "ScaffoldedProjectRule: For scaffolded projects, translate specify request into Meta Prompt Delta Todo (do not rebuild full meta foundation).";
+
+function buildPromptReference(hashCode, contextLines = []) {
+  return [
+    "Protocol: Prompt Generator Only",
+    `PromptSpec: ${PROMPT_SPEC_DOC}#${hashCode}`,
+    "Use the referenced section template and scope guard.",
+    "",
+    "Context:",
+    ...contextLines
+  ].join("\n");
+}
 
 async function refreshRealProjectsListing() {
   try {
@@ -357,16 +382,46 @@ async function refreshRealProjectsListing() {
 
     const payload = await response.json();
     realProjectRows = Array.isArray(payload.projects) ? payload.projects : [];
+    const hasTemplateMetadata =
+      payload && Object.prototype.hasOwnProperty.call(payload, "template_archive_index");
+    templateGovernanceMetadataAvailable = Boolean(hasTemplateMetadata);
+    templateArchiveIndexInfo =
+      hasTemplateMetadata && payload && typeof payload.template_archive_index === "object"
+        ? payload.template_archive_index
+        : null;
     realProjectListingLoaded = true;
     realProjectListingFailed = false;
   } catch {
     realProjectRows = [];
+    templateArchiveIndexInfo = null;
+    templateGovernanceMetadataAvailable = false;
     realProjectListingLoaded = false;
     realProjectListingFailed = true;
     setDraftStatus("Could not load real project listing. Project panel now shows endpoint-unavailable state.");
   }
 
   renderSimpleProjectsList();
+}
+
+function getTemplateGuardFailureReason(row) {
+  if (!templateGovernanceMetadataAvailable) {
+    return "Template governance metadata not returned by /api/projects/list. Restart backend and refresh real project listing.";
+  }
+
+  const hasIndex = Boolean(templateArchiveIndexInfo && templateArchiveIndexInfo.exists);
+  if (!hasIndex) {
+    return "Template archive index missing: shared/templates/template_archive_index.json";
+  }
+
+  if (!row || !row.project_path) {
+    return "Project path missing for template validation.";
+  }
+
+  if (!row.template_index_mapped) {
+    return `Template mapping missing for ${row.project_path} in shared/templates/template_archive_index.json`;
+  }
+
+  return "";
 }
 
 function cloneObjectOfArrays(source, fallback) {
@@ -468,146 +523,74 @@ function renderSetupDropdowns(preferredClient, preferredProject, preferredSystem
 }
 
 function buildCopilotTaskRequest(client, project, description) {
-  return [
-    `Protocol: Prompt Generator Only`,
-    `Action: Generate implementation code from this intake.`,
+  return buildPromptReference("PGH-INTAKE-CODEGEN", [
     `Client: ${client}`,
     `Project: ${project}`,
     `Description: ${description}`,
-    "",
-    "Rules:",
-    "- Treat this request as code-generation only.",
-    "- Do not modify Foundry core files unless explicitly requested.",
-    "- Produce a concrete implementation task list and first executable code step.",
-    "- Return files to create/update and exact code blocks."
-  ].join("\n");
+    INTAKE_ENVIRONMENT_QUESTIONS_REQUIRED,
+    INTAKE_META_RECIPE,
+    META_PROMPT_TODO_REQUIREMENT,
+    "LifecycleRule: Intake seeds meta-prompt todo; start executes that todo first."
+  ]);
 }
 
 function buildCopilotDeleteRequest(client, project) {
-  return [
-    "Protocol: Prompt Generator Only",
-    "Action: Delete generated project from workspace.",
+  return buildPromptReference("PGH-DELETE-PROJECT", [
     `Client: ${client}`,
     `Project: ${project}`,
-    "",
-    "Delete target:",
-    `- clients/${client}/systems/${project}`,
-    "",
-    "Rules:",
-    "- Delete only the target project folder.",
-    "- Do not touch other clients/projects.",
-    "- After deletion, confirm removed paths.",
-    "- No Foundry core edits."
-  ].join("\n");
+    `DeleteTarget: clients/${client}/systems/${project}`
+  ]);
 }
 
 function buildCopilotSetStateRequest(client, project, system, nextStatus) {
   if (nextStatus === "start") {
-    return [
-      "Protocol: Prompt Generator Only",
-      "Action: Start working on this project.",
+    return buildPromptReference("PGH-STATE-START", [
       `Client: ${client}`,
       `Project: ${project}`,
       `System: ${system}`,
-      "",
-      "What to do:",
-      "- Update project state to start in project files.",
-      "- Read and collect pending todo items from project docs/task files.",
-      "- Resume work by completing the pending todo items in priority order.",
-      "- Prioritize first executable step and report progress against todo.",
-      "",
-      "Rules:",
-      "- Edit only this project path.",
-      "- Do not touch Foundry core files.",
-      "- Keep JSON valid and preserve existing fields.",
-      "- Confirm exactly which files were updated."
-    ].join("\n");
+      "RequestedState: start",
+      "ExecutionOrder: Execute meta-prompt todo first (meta-philosophy/meta-skill/meta-framework/meta-scaffold), then remaining todos."
+    ]);
   }
 
   if (nextStatus === "stop") {
-    return [
-      "Protocol: Prompt Generator Only",
-      "Action: Stop working on this project.",
+    return buildPromptReference("PGH-STATE-STOP", [
       `Client: ${client}`,
       `Project: ${project}`,
       `System: ${system}`,
-      "",
-      "What to do:",
-      "- Update all relevant project documents.",
-      "- Add current important notes and current state summary.",
-      "- Convert unfinished work into a clear todo list for next start.",
-      "- Pause any ongoing project process and mark project as stop.",
-      "",
-      "Rules:",
-      "- Edit only this project path.",
-      "- Do not touch Foundry core files.",
-      "- Keep JSON/markdown valid and preserve existing fields.",
-      "- Confirm exactly which files were updated."
-    ].join("\n");
+      "RequestedState: stop"
+    ]);
   }
 
-  return [
-    "Protocol: Prompt Generator Only",
-    "Action: Set project state by applying file changes in workspace.",
+  return buildPromptReference("PGH-STATE-GENERIC", [
     `Client: ${client}`,
     `Project: ${project}`,
     `System: ${system}`,
-    `New Status: ${nextStatus}`,
-    "",
-    "Update targets:",
-    `- clients/${client}/systems/${project}/project.state.json (if present)`,
-    `- clients/${client}/systems/${project}/copilot.tasks.json (optional status alignment)`,
-    "",
-    "Rules:",
-    "- Edit only this project path.",
-    "- Do not touch Foundry core files.",
-    "- Keep JSON valid and preserve existing fields.",
-    "- Confirm exactly which files were updated."
-  ].join("\n");
+    `RequestedState: ${nextStatus}`
+  ]);
 }
 
 function buildCopilotCustomizeRequest(client, project, system, status) {
   if (status === "stop") {
-    return [
-      "Protocol: Prompt Generator Only",
-      "Action: Capture customization request as todo only (project is stopped).",
+    return buildPromptReference("PGH-SPECIFY-STOP-TODO", [
       `Client: ${client}`,
       `Project: ${project}`,
       `System: ${system}`,
-      `Current Status: ${status}`,
-      "",
-      "What to do:",
-      "- Ask clarifying questions to understand requested customization.",
-      "- Do not implement code changes while state is stop.",
-      "- Add/update a prioritized todo list in project docs/tasks.",
-      "- Prepare start-ready plan notes for next start action.",
-      "",
-      "Output format:",
-      "- Restate requested customization.",
-      "- Todo entries to add with priorities.",
-      "- Files updated for todo/documentation only."
-    ].join("\n");
+      `CurrentStatus: ${status}`,
+      META_PROMPT_TODO_REFORM_REQUIREMENT,
+      META_PROMPT_DELTA_REQUIREMENT,
+      "MetaPromptTemplate: gui_prompt_sections.md#PGH-META-PROMPT-TODO-TEMPLATE"
+    ]);
   }
 
-  return [
-    "Protocol: Prompt Generator Only",
-    "Action: Customize existing project behavior by user request.",
+  return buildPromptReference("PGH-SPECIFY-ACTIVE", [
     `Client: ${client}`,
     `Project: ${project}`,
     `System: ${system}`,
-    `Current Status: ${status}`,
-    "",
-    "What to do:",
-    "- Ask clarifying questions first to understand desired customization.",
-    "- Propose a short implementation plan.",
-    "- Implement only after user confirms direction.",
-    "- Keep edits scoped to this project path unless explicitly expanded.",
-    "",
-    "Output format:",
-    "- Restate requested customization.",
-    "- List files to update.",
-    "- Provide exact code changes."
-  ].join("\n");
+    `CurrentStatus: ${status}`,
+    META_PROMPT_DELTA_REQUIREMENT,
+    "MetaPromptTemplate: gui_prompt_sections.md#PGH-META-PROMPT-TODO-TEMPLATE"
+  ]);
 }
 
 function renderSimpleProjectsList() {
@@ -644,7 +627,18 @@ function renderSimpleProjectsList() {
           updated_by: "user",
           last_updated: ""
         };
-        return { key, client, project, system, status: state.status };
+        return {
+          key,
+          client,
+          project,
+          system,
+          status: state.status,
+          project_path: String(row.project_path || `clients/${client}/systems/${project}`),
+          template_index_mapped:
+            row && Object.prototype.hasOwnProperty.call(row, "template_index_mapped")
+              ? row.template_index_mapped === true
+              : null
+        };
       });
 
   if (rows.length === 0) {
@@ -681,6 +675,17 @@ function renderSimpleProjectsList() {
 
     const saveBtn = card.querySelector("button[data-action='save-project-status']");
     saveBtn.addEventListener("click", () => {
+      const guardFailure = getTemplateGuardFailureReason(row);
+      if (guardFailure) {
+        copilotTaskRequest.textContent = [
+          "Prompt generation blocked by template governance guard.",
+          `Reason: ${guardFailure}`,
+          "Action: Add/update template mapping in shared/templates/template_archive_index.json and refresh real project listing."
+        ].join("\n");
+        setDraftStatus("State prompt blocked: template governance validation failed.");
+        return;
+      }
+
       const text = buildCopilotSetStateRequest(
         row.client,
         row.project,
@@ -700,6 +705,17 @@ function renderSimpleProjectsList() {
 
     const specifyPromptBtn = card.querySelector("button[data-action='generate-specify-copilot-text']");
     specifyPromptBtn.addEventListener("click", () => {
+      const guardFailure = getTemplateGuardFailureReason(row);
+      if (guardFailure) {
+        copilotTaskRequest.textContent = [
+          "Prompt generation blocked by template governance guard.",
+          `Reason: ${guardFailure}`,
+          "Action: Add/update template mapping in shared/templates/template_archive_index.json and refresh real project listing."
+        ].join("\n");
+        setDraftStatus("Specify prompt blocked: template governance validation failed.");
+        return;
+      }
+
       const text = buildCopilotCustomizeRequest(row.client, row.project, row.system, statusSelect.value);
       copilotTaskRequest.textContent = text;
       setDraftStatus("Customization prompt generated. Paste in chat and continue discussion with Copilot.");
@@ -757,6 +773,12 @@ function processSimpleIntake() {
   const intakeTaskTitle = `Intake: ${project} - ${description.slice(0, 80)}`;
   taskModel.push({
     title: intakeTaskTitle,
+    state: "planned",
+    priority: "high"
+  });
+
+  taskModel.push({
+    title: `Meta prompt foundation: ${project} (meta-philosophy/meta-skill/meta-framework/meta-scaffold)`,
     state: "planned",
     priority: "high"
   });

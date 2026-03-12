@@ -3201,6 +3201,143 @@ Files updated:
 * `web/app.js`
 * `universal_meta_foundry_v3.md`
 
+### 26.54 Template Intelligence Governance for Prompt Lifecycle
+
+Date: 2026-03-12
+
+Added a standard template-intelligence policy so all systems follow the same specify/start/stop reuse process.
+
+Behavior:
+
+* todo generation now requires scanning internal reusable knowledge first
+* reusable findings should be listed directly in todo items (for example protocol patterns like MQTT, package/install patterns like apt, diagnostics blocks, and interface patterns when relevant)
+* specify flows now always run template-intelligence checks before planning
+* start flows now evaluate whether implemented work should be promoted as reusable template assets (`building_block` or `complex_pattern`)
+* template upgrades now require compatibility and migration notes
+* a template archive index must map which templates each project uses
+
+Files updated:
+
+* `gui_prompt_sections.md`
+* `shared/templates/soul.identity.template.json`
+* `shared/templates/template_archive_index.json`
+* `universal_meta_foundry_v3.md`
+
+### 26.55 Runtime Prompt Guard + Intake Meta Recipe Enforcement
+
+Date: 2026-03-12
+
+Added runtime enforcement so prompt generation remains consistent with template governance and Foundry meta recipe usage.
+
+Behavior:
+
+* state/specify prompt generation now validates template governance before generating text
+* generation is blocked when template archive index is missing or project-template mapping is missing
+* blocked generation now returns a clear remediation instruction in Copilot text panel
+* intake prompt context now explicitly states that the Foundry philosophy/meta stack must be applied before implementation planning
+* backend listing payload now includes template archive metadata and per-project mapping validation flags
+
+Files updated:
+
+* `app/main.py`
+* `web/app.js`
+* `gui_prompt_sections.md`
+* `universal_meta_foundry_v3.md`
+
+### 26.56 Intake Meta-Prompt Seeding + Start Execution Order
+
+Date: 2026-03-12
+
+Extended intake/start lifecycle so every new project follows the same Foundry meta setup pattern.
+
+Behavior:
+
+* intake spec now requires creating a high-priority meta prompt todo immediately
+* required meta prompt content: meta-philosophy, meta-skill, meta-framework, and meta-scaffold
+* generated intake prompt context now includes lifecycle rule that start must execute the meta prompt todo first
+* start spec now explicitly enforces meta-prompt todo execution before feature todos
+* intake UI now seeds a local high-priority task entry for the meta prompt foundation
+* project listing row mapping now preserves template-index metadata used by runtime guard checks
+
+Files updated:
+
+* `gui_prompt_sections.md`
+* `web/app.js`
+* `universal_meta_foundry_v3.md`
+
+### 26.57 Smart Meta Prompt Markdown Template for Intake + Pre-Start Specify
+
+Date: 2026-03-12
+
+Refined prompt markdown guidance so Copilot always creates/reforms a smart meta prompt todo in consistent structure.
+
+Behavior:
+
+* intake now explicitly requires using a dedicated meta prompt todo markdown template
+* added `PGH-META-PROMPT-TODO-TEMPLATE` section with required structure:
+  * meta philosophy
+  * meta skill
+  * meta framework
+  * meta scaffold
+  * governance + acceptance rules
+* pre-start specify (`stop` state) now explicitly requires reforming/refreshing meta prompt todo before other todo updates
+* stop specify prompt context now includes direct reference to the template hash section
+
+Files updated:
+
+* `gui_prompt_sections.md`
+* `web/app.js`
+* `universal_meta_foundry_v3.md`
+
+### 26.58 Scaffolded Specify Uses Meta Prompt Delta Todo
+
+Date: 2026-03-12
+
+Refined specify behavior for already scaffolded projects to avoid unnecessary full meta regeneration.
+
+Behavior:
+
+* specify on scaffolded projects now translates requests into `Meta Prompt Delta Todo`
+* full meta foundation is not recreated when baseline already exists
+* both stop and active specify prompt contexts now include explicit scaffolded-project delta rule
+* meta prompt markdown template now includes scaffolded project delta guidance
+
+Purpose:
+
+* preserves consistent meta governance while reducing redundant setup churn
+* keeps todo updates focused on meaningful meta deltas
+* improves clarity and execution speed for mature projects
+
+Files updated:
+
+* `gui_prompt_sections.md`
+* `web/app.js`
+* `universal_meta_foundry_v3.md`
+
+### 26.59 Template Guard Stale-Metadata Detection
+
+Date: 2026-03-12
+
+Improved prompt guard diagnostics when generating start/specify prompts.
+
+Behavior:
+
+* guard now distinguishes between:
+  * missing template index file
+  * stale backend payload that does not include template-governance metadata
+* stale payload message now instructs restart of backend and refresh of real project listing
+* project mapping field now preserves tri-state semantics (`true` / `false` / unknown) instead of coercing unknown to `false`
+
+Purpose:
+
+* prevent false "index missing" message when backend is running older API shape
+* provide accurate recovery action for user
+
+Files updated:
+
+* `web/app.js`
+* `universal_meta_foundry_v3.md`
+
 ### 26.52 Stop-State Todo Gating for Specify and Start Prompts
 
 Date: 2026-03-12
@@ -3226,5 +3363,57 @@ Outcome:
 
 Files updated:
 
+* `web/app.js`
+* `universal_meta_foundry_v3.md`
+
+### 26.53 Section-Based Prompt References via Markdown Hash Codes
+
+Date: 2026-03-12
+
+Replaced long inline generated prompt text with compact references to a shared GUI prompt specification document.
+
+Behavior:
+
+* new prompt spec doc: `gui_prompt_sections.md`
+* each prompt type has a hash code section (examples):
+  * `PGH-INTAKE-CODEGEN`
+  * `PGH-DELETE-PROJECT`
+  * `PGH-STATE-START`
+  * `PGH-STATE-STOP`
+  * `PGH-SPECIFY-ACTIVE`
+  * `PGH-SPECIFY-STOP-TODO`
+* GUI-generated prompt text now includes:
+  * `PromptSpec: gui_prompt_sections.md#<HASH_CODE>`
+  * project-specific context only
+
+Outcome:
+
+* shorter generated prompt text in GUI
+* centralized prompt behavior definitions in one markdown file
+* easier governance and updates across all prompt types
+
+Files updated:
+
+* `gui_prompt_sections.md`
+* `web/app.js`
+* `universal_meta_foundry_v3.md`
+
+### 26.60 Foundry Future Planner + Intake Environment Clarification Rule
+
+Date: 2026-03-12
+
+Added a dedicated Foundry-level deferred-work planner and strengthened intake policy for environment/toolchain selection.
+
+Behavior:
+
+* new Foundry planner file for deferred fixes and roadmap-style backlog capture
+* intake prompt spec now requires clarification questions for environment/toolchain and board profile before implementation
+* if environment/toolchain is unresolved, intake must add a high-priority environment-decision todo
+* intake generated prompt context now includes explicit clarification requirement (for example ESP-IDF vs PlatformIO)
+
+Files updated:
+
+* `foundry_future_planner.md`
+* `gui_prompt_sections.md`
 * `web/app.js`
 * `universal_meta_foundry_v3.md`

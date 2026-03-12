@@ -43,6 +43,46 @@ def scan_real_projects(workspace_root: Path) -> list[dict[str, object]]:
     return rows
 
 
+def load_template_archive_index(workspace_root: Path) -> dict[str, object]:
+    index_path = workspace_root / "shared" / "templates" / "template_archive_index.json"
+    if not index_path.exists():
+        return {
+            "exists": False,
+            "path": "shared/templates/template_archive_index.json",
+            "mapped_project_paths": [],
+            "mapping_count": 0,
+        }
+
+    try:
+        payload = json.loads(index_path.read_text(encoding="utf-8"))
+    except Exception:
+        return {
+            "exists": True,
+            "path": "shared/templates/template_archive_index.json",
+            "parse_error": True,
+            "mapped_project_paths": [],
+            "mapping_count": 0,
+        }
+
+    usage = payload.get("project_template_usage") if isinstance(payload, dict) else None
+    mapped_project_paths: list[str] = []
+    if isinstance(usage, list):
+        for row in usage:
+            if not isinstance(row, dict):
+                continue
+            project_path = row.get("project_path")
+            if isinstance(project_path, str) and project_path.strip():
+                mapped_project_paths.append(project_path.strip().replace("\\", "/"))
+
+    mapped_project_paths = sorted(set(mapped_project_paths))
+    return {
+        "exists": True,
+        "path": "shared/templates/template_archive_index.json",
+        "mapped_project_paths": mapped_project_paths,
+        "mapping_count": len(mapped_project_paths),
+    }
+
+
 def create_app() -> FastAPI:
     app = FastAPI(title="Universal Meta Foundry Sanity API")
     workspace_root = Path(__file__).resolve().parent.parent
@@ -60,8 +100,23 @@ def create_app() -> FastAPI:
 
     @app.get("/api/projects/list")
     def list_projects() -> dict[str, object]:
+        projects = scan_real_projects(workspace_root)
+        template_index = load_template_archive_index(workspace_root)
+
+        mapped_set = set(template_index.get("mapped_project_paths", []))
+        validated_projects: list[dict[str, object]] = []
+        for row in projects:
+            client = str(row.get("client", ""))
+            project = str(row.get("project", ""))
+            project_path = f"clients/{client}/systems/{project}"
+            validated_row = dict(row)
+            validated_row["project_path"] = project_path
+            validated_row["template_index_mapped"] = project_path in mapped_set
+            validated_projects.append(validated_row)
+
         return {
-            "projects": scan_real_projects(workspace_root)
+            "projects": validated_projects,
+            "template_archive_index": template_index,
         }
 
     return app

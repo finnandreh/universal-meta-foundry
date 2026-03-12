@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "last_updated": "2026-03-12",
+  "policy": {
+    "always_check_on_specify": true,
+    "require_start_state_template_evaluation": true,
+    "require_backward_compatibility_notes_on_upgrade": true,
+    "require_project_template_mapping": true
+  },
+  "template_catalog": [
+    {
+      "template_id": "soul.identity.template",
+      "version": "1.0.0",
+      "path": "shared/templates/soul.identity.template.json",
+      "kind": "building_block",
+      "compatibility": "backward_compatible"
+    }
+  ],
+  "project_template_usage": [
+    {
+      "project_path": "clients/finn/systems/esp32metstest",
+      "templates": [
+        {
+          "template_id": "soul.identity.template",
+          "version": "1.0.0",
+          "role": "governance_reference"
+        }
+      ]
+    },
+    {
+      "project_path": "clients/test/systems/intake-project",
+      "templates": [
+        {
+          "template_id": "soul.identity.template",
+          "version": "1.0.0",
+          "role": "governance_reference"
+        }
+      ]
+    }
+  ]
+}

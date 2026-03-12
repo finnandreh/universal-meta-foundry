@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "client": "finn",
+  "project": "esp32metstest",
+  "platform": "esp-idf",
+  "target": "esp32",
+  "status": "start",
+  "tasks": [
+    {
+      "id": "espm-001",
+      "title": "Meta prompt foundation: meta-philosophy/meta-skill/meta-framework/meta-scaffold",
+      "state": "done",
+      "priority": "high"
+    },
+    {
+      "id": "espm-002",
+      "title": "Scaffold ESP-IDF project layout for esp32metstest",
+      "state": "done",
+      "priority": "high"
+    },
+    {
+      "id": "espm-003",
+      "title": "Implement serial control for 2 digital outputs",
+      "state": "done",
+      "priority": "high"
+    },
+    {
+      "id": "espm-004",
+      "title": "Implement serial control for 8 PWM channels",
+      "state": "done",
+      "priority": "high"
+    },
+    {
+      "id": "espm-005",
+      "title": "Add status/help command contract and runtime logs",
+      "state": "done",
+      "priority": "medium"
+    },
+    {
+      "id": "espm-006",
+      "title": "Capture reusable LEDC and serial parser patterns in docs",
+      "state": "done",
+      "priority": "medium"
+    },
+    {
+      "id": "espm-007",
+      "title": "Validate board pin compatibility and adjust mappings",
+      "state": "done",
+      "priority": "high"
+    }
+  ]
+}

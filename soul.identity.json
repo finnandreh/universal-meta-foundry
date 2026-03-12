@@ -7,6 +7,15 @@
   "purpose": "Track pantry and fridge items with simple add/use/low-stock status so shopping decisions are fast.",
   "operating_model": {
     "mode": "single_user_local_first",
+    "template_intelligence": {
+      "always_check_on_specify": true,
+      "evaluate_for_template_promotion_on_start": true,
+      "reuse_sources": [
+        "project_history",
+        "sibling_systems",
+        "shared_templates"
+      ]
+    },
     "workflow": [
       "add_item",
       "update_quantity",
@@ -46,6 +55,21 @@
       "low",
       "out"
     ]
+  },
+  "template_governance": {
+    "template_archive_ref": "shared/templates/template_archive_index.json",
+    "project_template_bindings": [
+      {
+        "template_id": "soul.identity.template",
+        "template_version": "1.0.0",
+        "compatibility_mode": "backward_compatible"
+      }
+    ],
+    "upgrade_policy": {
+      "adopt_better_template_when_found": true,
+      "require_backward_compat_notes": true,
+      "require_migration_notes": true
+    }
   },
   "project_lifecycle": {
     "allowed_statuses": [

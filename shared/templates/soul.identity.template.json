@@ -7,7 +7,19 @@
   "purpose": "What this generated project is and why it exists.",
   "operating_model": {
     "mode": "prompt_first_or_execution_first",
-    "governance": "human_approval_required_for_structural_changes"
+    "governance": "human_approval_required_for_structural_changes",
+    "template_intelligence": {
+      "always_check_on_specify": true,
+      "reuse_sources": [
+        "project_history",
+        "sibling_systems",
+        "shared_templates"
+      ],
+      "classification": [
+        "building_block",
+        "complex_pattern"
+      ]
+    }
   },
   "instruction_scope": {
     "copilot_instructions_apply_to": "this_project_only",
@@ -21,6 +33,21 @@
     "out_of_scope": [
       "list exclusions"
     ]
+  },
+  "template_governance": {
+    "template_archive_ref": "shared/templates/template_archive_index.json",
+    "project_template_bindings": [
+      {
+        "template_id": "template-or-module-id",
+        "template_version": "0.1.0",
+        "compatibility_mode": "backward_compatible"
+      }
+    ],
+    "upgrade_policy": {
+      "adopt_better_template_when_found": true,
+      "require_backward_compat_notes": true,
+      "require_migration_notes": true
+    }
   },
   "identity_notes": "Customize this file per generated project. Do not copy master identity unchanged."
 }
