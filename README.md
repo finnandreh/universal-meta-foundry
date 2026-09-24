@@ -1,5 +1,13 @@
 # Universal Meta-Foundry
 
+## Public source status
+
+This is a local prototype of a governed project-generation workflow. The
+included `clients/test` content is synthetic example material. Repository
+availability does not establish a production deployment or validated behavior
+for a real customer. Generated Python cache files are excluded from the current
+tree; historical cache objects were inspected before this source release.
+
 Universal Meta-Foundry is a prompt-governed system for creating new projects with a consistent architecture process, not just ad-hoc code generation.
 
 Instead of jumping directly into implementation, this repository enforces a reusable flow:
@@ -97,3 +105,7 @@ When adding or modifying behavior:
 - Keep changes aligned with the prompt spec in gui_prompt_sections.md
 - Keep docs updated (README/changelog/planner) with meaningful changes
 - Preserve project scope boundaries and avoid unrelated core edits
+
+## License
+
+Copyright © 2026 Finn André Hotvedt. Licensed under the [MIT License](LICENSE).
